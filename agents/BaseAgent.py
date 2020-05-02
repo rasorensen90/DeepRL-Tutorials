@@ -2,6 +2,7 @@ import numpy as np
 import pickle
 import os.path
 import csv
+import gym
 
 import torch
 import torch.optim as optim
@@ -12,13 +13,19 @@ class BaseAgent(object):
         self.model=None
         self.target_model=None
         self.optimizer = None
+        self.env = env
 
         self.log_dir = log_dir
 
         self.rewards = []
-
+        
         self.action_log_frequency = config.ACTION_SELECTION_COUNT_FREQUENCY
-        self.action_selections = [0 for _ in range(env.action_space.n)]
+        if isinstance(self.env.action_space, gym.spaces.MultiDiscrete):
+            self.action_selections = []
+            for n in self.env.action_space.nvec:
+                self.action_selections.append([0 for _ in range(n)])
+        else:
+            self.action_selections = [0 for _ in range(self.env.action_space.n)]
 
     def huber(self, x):
         cond = (x.abs() < 1.0).float().detach()
@@ -72,9 +79,10 @@ class BaseAgent(object):
         self.rewards.append(reward)
 
     def save_action(self, action, tstep):
-        self.action_selections[int(action)] += 1.0/self.action_log_frequency
-        if (tstep+1) % self.action_log_frequency == 0:
-            with open(os.path.join(self.log_dir, 'action_log.csv'), 'a') as f:
-                writer = csv.writer(f)
-                writer.writerow(list([tstep]+self.action_selections))
-            self.action_selections = [0 for _ in range(len(self.action_selections))]
+        for i in range(len(action)):
+            self.action_selections[i][int(action[i])] += 1.0/self.action_log_frequency
+            if (tstep+1) % self.action_log_frequency == 0:
+                with open(os.path.join(self.log_dir, 'action_'+str(i)+'_log.csv'), 'a') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(list([tstep]+self.action_selections[i]))
+                    self.action_selections[i] = [0 for _ in range(len(self.action_selections[i]))]

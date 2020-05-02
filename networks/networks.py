@@ -67,6 +67,64 @@ class DuelingDQN(nn.Module):
             self.adv2.sample_noise()
             self.val1.sample_noise()
             self.val2.sample_noise()
+            
+class BHSDuelingDQN(nn.Module):
+    def __init__(self, input_shape, num_outputs):
+        super(BHSDuelingDQN, self).__init__()
+
+        self.input_shape = input_shape
+        self.num_actions = num_outputs # a vector of the number of actions at each diverter
+
+        self.conv1 = nn.Conv2d(self.input_shape[0], 128, kernel_size=[3,1], stride=1, padding="same")
+        self.conv2_1 = nn.Conv2d(128, 64, kernel_size=[3,1], stride=1, padding="same")
+        self.conv2_2 = nn.Conv2d(128, 64, kernel_size=[5,1], stride=1, padding="same")
+        self.conv2_3 = nn.Conv2d(128, 64, kernel_size=[7,1], stride=1, padding="same")
+        
+        self.conv3 = nn.Conv2d(64*3, 128, kernel_size=[3,1], stride=1, padding="same")
+        self.conv4 = nn.Conv2d(128, 128, kernel_size=[3,1], stride=1, padding="same")
+        self.conv5 = nn.Conv2d(128, 128, kernel_size=[3,1], stride=1, padding="same")
+
+        self.adv = nn.Linear(self.feature_size(), sum(self.num_actions)) # Might be an idea to add another fc layer here
+
+        self.val1 = nn.Linear(self.feature_size(), 64)
+        self.val2 = nn.Linear(64, 64)
+        self.val3 = nn.Linear(64, len(self.num_actions))
+
+    def forward(self, x):
+        x = x[:,:,None,:]
+        x = F.relu(self.conv1(x))
+        x1 = F.relu(self.conv2_1(x))
+        x2 = F.relu(self.conv2_2(x))
+        x3 = F.relu(self.conv2_3(x))
+        x = torch.cat((x1,x2,x3),0)
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+        x = F.relu(self.conv5(x))
+        x = x.view(x.size(0), -1)
+        
+        adv = F.relu(self.adv(x))
+        adv = adv.view(len(self.num_actions),-1)
+
+        val = F.relu(self.val1(x))
+        val = self.val2(val)
+
+        return val + adv - adv.mean()
+
+    def feature_size(self):
+        return(sum(self.input_shape)*128)
+        # return self.conv3(self.conv2(self.conv1(torch.zeros(1, *self.input_shape)))).view(1, -1).size(1)
+
+    def sample_noise(self):
+        #ignore this for now
+        pass
+    
+    def sample_noise(self):
+        if self.noisy:
+            self.body.sample_noise()
+            self.adv1.sample_noise()
+            self.adv2.sample_noise()
+            self.val1.sample_noise()
+            self.val2.sample_noise()            
 
 class CategoricalDQN(nn.Module):
     def __init__(self, input_shape, num_outputs, noisy=False, sigma_init=0.5, body=SimpleBody, atoms=51):

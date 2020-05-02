@@ -2,6 +2,7 @@ import numpy as np
 
 import torch
 import torch.optim as optim
+import gym
 
 from agents.BaseAgent import BaseAgent
 from networks.networks import DQN
@@ -32,7 +33,7 @@ class Model(BaseAgent):
 
         self.static_policy = static_policy
         self.num_feats = env.observation_space.shape
-        self.num_actions = env.action_space.n
+        self.num_actions = env.action_space.nvec if isinstance(env.action_space, gym.spaces.MultiDiscrete) else env.action_space.n
         self.env = env
 
         self.declare_networks()
@@ -85,10 +86,10 @@ class Model(BaseAgent):
         shape = (-1,)+self.num_feats
 
         batch_state = torch.tensor(batch_state, device=self.device, dtype=torch.float).view(shape)
-        batch_action = torch.tensor(batch_action, device=self.device, dtype=torch.long).squeeze().view(-1, 1)
+        batch_action = torch.tensor(batch_action, device=self.device, dtype=torch.long).squeeze().view(-1, len(self.num_actions), 1)
         batch_reward = torch.tensor(batch_reward, device=self.device, dtype=torch.float).squeeze().view(-1, 1)
         
-        non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch_next_state)), device=self.device, dtype=torch.uint8)
+        non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch_next_state)), device=self.device, dtype=torch.bool)
         try: #sometimes all next states are false
             non_final_next_states = torch.tensor([s for s in batch_next_state if s is not None], device=self.device, dtype=torch.float).view(shape)
             empty_next_state_values = False
@@ -103,16 +104,16 @@ class Model(BaseAgent):
 
         #estimate
         self.model.sample_noise()
-        current_q_values = self.model(batch_state).gather(1, batch_action)
+        current_q_values = torch.sum(self.model(batch_state).gather(-1, batch_action), dim=-1)
         
         #target
         with torch.no_grad():
-            max_next_q_values = torch.zeros(self.batch_size, device=self.device, dtype=torch.float).unsqueeze(dim=1)
+            max_next_q_values = torch.zeros([self.batch_size, len(self.num_actions)], device=self.device, dtype=torch.float).unsqueeze(dim=2)
             if not empty_next_state_values:
                 max_next_action = self.get_max_next_state_action(non_final_next_states)
                 self.target_model.sample_noise()
-                max_next_q_values[non_final_mask] = self.target_model(non_final_next_states).gather(1, max_next_action)
-            expected_q_values = batch_reward + ((self.gamma**self.nsteps)*max_next_q_values)
+                max_next_q_values[non_final_mask] = self.target_model(non_final_next_states).gather(-1, max_next_action)
+            expected_q_values = batch_reward + ((self.gamma**self.nsteps)*torch.sum(max_next_q_values, dim=-1))
 
         diff = (expected_q_values - current_q_values)
         if self.priority_replay:
@@ -150,14 +151,17 @@ class Model(BaseAgent):
 
     def get_action(self, s, eps=0.1): #faster
         with torch.no_grad():
-            if np.random.random() >= eps or self.static_policy or self.noisy:
-                X = torch.tensor([s], device=self.device, dtype=torch.float)
-                self.model.sample_noise()
-                a = self.model(X).max(1)[1].view(1, 1)
-                return a.item()
-            else:
-                return np.random.randint(0, self.num_actions)
-
+            X = torch.tensor([s], device=self.device, dtype=torch.float)
+            self.model.sample_noise()
+            a = self.model(X).max(-1)[1].view(1, -1)
+            act = np.zeros(a.size(),dtype=np.int32)
+            #for n in range(a.size()[0]): # batches
+            for i in range(a.size()[1]): # diverters
+                if np.random.random() >= eps or self.static_policy or self.noisy:
+                    act[0][i] = int(a[0][i].item())
+                else:
+                    act[0][i] = np.random.randint(0, self.num_actions[i])
+            return act
     def update_target_model(self):
         self.update_count+=1
         self.update_count = self.update_count % self.target_net_update_freq
@@ -165,7 +169,7 @@ class Model(BaseAgent):
             self.target_model.load_state_dict(self.model.state_dict())
 
     def get_max_next_state_action(self, next_states):
-        return self.target_model(next_states).max(dim=1)[1].view(-1, 1)
+        return self.target_model(next_states).max(dim=-1)[1].view(-1, len(self.num_actions), 1)
 
     def finish_nstep(self):
         while len(self.nstep_buffer) > 0:
