@@ -53,9 +53,10 @@ def load_reward_data(indir, smooth, bin_size):
             f.readline()
             for line in f:
                 tmp = line.split(',')
-                t_time = float(tmp[2])
-                tmp = [t_time, int(tmp[1]), float(tmp[0])]
-                datas.append(tmp)
+                if len(tmp) > 1:
+                    t_time = float(tmp[2])
+                    tmp = [t_time, int(tmp[1]), float(tmp[0])]
+                    datas.append(tmp)
 
     datas = sorted(datas, key=lambda d_entry: d_entry[0])
     result = []
@@ -87,8 +88,9 @@ def load_custom_data(indir, stat_file, smooth, bin_size):
         with open(inf, 'r') as f:
             for line in f:
                 tmp = line.split(',')
-                tmp = [int(tmp[0]), float(tmp[1])]
-                datas.append(tmp)
+                if len(tmp) > 1:
+                    tmp = [int(tmp[0]), float(tmp[1])]
+                    datas.append(tmp)
 
     datas = sorted(datas, key=lambda d_entry: d_entry[0])
     result = []
