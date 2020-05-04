@@ -246,6 +246,7 @@ def plot_all_data(folder, game, name, num_steps, bin_size=(10, 100, 100, 1), smo
     tx, ty = load_custom_data(folder, 'td.csv', smooth, bin_size[1])
 
     ax2.set_title('Loss vs Timestep')
+    ax2.set_yscale("log")
 
     if tx is not None or ty is not None:
         ax2.set_ylabel('Avg .Temporal Difference')
@@ -254,7 +255,6 @@ def plot_all_data(folder, game, name, num_steps, bin_size=(10, 100, 100, 1), smo
 
         ax2.yaxis.label.set_color(p2.get_color())
         ax2.tick_params(axis='y', colors=p2.get_color())
-
         ax2.legend(g2_lines, [l.get_label() for l in g2_lines], loc=4)
     
     #Load Sigma Parameter Data if it exists
