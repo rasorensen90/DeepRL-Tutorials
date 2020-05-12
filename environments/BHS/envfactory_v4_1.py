@@ -8,6 +8,7 @@ from .Element import Element, Diverter, Merger, Toploader
 import networkx as nx
 import numpy as np
 import scipy
+import torch
 #import pylab as plt
 #from networkx.drawing.nx_agraph import graphviz_layout, to_agraph
 #import pygraphviz as pgv
@@ -45,6 +46,16 @@ def createGCNMat(graph):
     GCNMat = np.float32(GCNMat)
     
     return GCNMat
+
+def createEdgelist(graph):
+    edge_start = []
+    edge_end = []
+    for node in graph.nodes:
+        for edge in graph.neighbors(node):
+            edge_start.append(node)
+            edge_end.append(edge)
+    edge_list = torch.tensor([edge_start, edge_end], dtype=torch.long)
+    return edge_list
 
 def env_0_0(): #16 elements
     graph = nx.DiGraph()
@@ -278,13 +289,13 @@ def env_2_0(): #101 elements
     P6_o1_0 = elements[-1].ID
     connect(elements[P6_o1_0],0,elements[P5_i],1,graph)
     
-    
     GCNMat = createGCNMat(graph)
-    [print(e.ID, e.__class__.__name__) for e in elements]
+    edgelist = createEdgelist(graph)
+    #[print(e.ID, e.__class__.__name__) for e in elements]
 #    nx.draw_spectral(graph)
 #    plt.show()
     print('Number of elements in environment: ', len(elements))
-    return elements, dst, src, graph, GCNMat
+    return elements, dst, src, graph, edgelist
 
 def env_3_0(): #265 elements
     elements = []

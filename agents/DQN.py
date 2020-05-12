@@ -3,7 +3,7 @@ import numpy as np
 import torch
 import torch.optim as optim
 import gym
-
+from torch_geometric.data import Data
 from agents.BaseAgent import BaseAgent
 from networks.networks import DQN
 from networks.network_bodies import AtariBody, SimpleBody
@@ -99,11 +99,12 @@ class Model(BaseAgent):
 
         return batch_state, batch_action, batch_reward, non_final_next_states, non_final_mask, empty_next_state_values, indices, weights
 
-    def compute_loss(self, batch_vars): #faster
+    def compute_loss(self, batch_vars, s_): #faster
         batch_state, batch_action, batch_reward, non_final_next_states, non_final_mask, empty_next_state_values, indices, weights = batch_vars
 
         #estimate
         self.model.sample_noise()
+        batch_state = Data(x=batch_state, edge_index=s_.edge_index)
         current_q_values = torch.sum(self.model(batch_state).gather(-1, batch_action), dim=-1)
         
         #target
@@ -136,7 +137,7 @@ class Model(BaseAgent):
 
         batch_vars = self.prep_minibatch()
 
-        loss = self.compute_loss(batch_vars)
+        loss = self.compute_loss(batch_vars, s_)
 
         # Optimize the model
         self.optimizer.zero_grad()
@@ -151,9 +152,9 @@ class Model(BaseAgent):
 
     def get_action(self, s, eps=0.1): #faster
         with torch.no_grad():
-            X = torch.tensor([s], device=self.device, dtype=torch.float)
+            #X = torch.tensor([s], device=self.device, dtype=torch.float)
             self.model.sample_noise()
-            a = self.model(X).max(-1)[1].view(1, -1)
+            a = self.model(s).max(-1)[1].view(1, -1)
             act = np.zeros(a.size(),dtype=np.int32)
             #for n in range(a.size()[0]): # batches
             for i in range(a.size()[1]): # diverters

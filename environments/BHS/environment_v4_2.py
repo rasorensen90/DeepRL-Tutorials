@@ -16,7 +16,7 @@ from .SPGraph import SPGraph, dijsktra
 class Environment(gym.Env):
     def __init__(self, args):
         
-        self.elems, self.dst, self.src, self.graph, self.GCNMat = globals()[args.envtype]()
+        self.elems, self.dst, self.src, self.graph, self.edgelist = globals()[args.envtype]()
         self.totes = []
         self.reward = 0
         self.action_space = []
