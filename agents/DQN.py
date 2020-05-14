@@ -3,7 +3,7 @@ import numpy as np
 import torch
 import torch.optim as optim
 import gym
-from torch_geometric.data import Data
+from torch_geometric.data import Data, Batch
 from agents.BaseAgent import BaseAgent
 from networks.networks import DQN
 from networks.network_bodies import AtariBody, SimpleBody
@@ -39,7 +39,7 @@ class Model(BaseAgent):
         self.declare_networks()
             
         self.target_model.load_state_dict(self.model.state_dict())
-        self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
+        self.optimizer = optim.RMSprop(self.model.parameters(), lr=self.lr)
         
         #move to correct device
         self.model = self.model.to(self.device)
@@ -104,9 +104,16 @@ class Model(BaseAgent):
 
         #estimate
         self.model.sample_noise()
-        batch_state = Data(x=batch_state, edge_index=s_.edge_index)
+        #batch_list = []
+        #for n in range(batch_state.shape[0]):
+        #    data = Data(x=batch_state[n],edge_index=s_.edge_index)
+        #    batch_list.append(data)
+        #batch_state = Batch()
+        #batch_state = batch_state.from_data_list(list(batch_list))
+        #print(non_final_next_states.shape)
+        #print(batch_action.shape)
+        #batch_state = Data(x=batch_state, edge_index=s_.edge_index)
         current_q_values = torch.sum(self.model(batch_state).gather(-1, batch_action), dim=-1)
-        
         #target
         with torch.no_grad():
             max_next_q_values = torch.zeros([self.batch_size, len(self.num_actions)], device=self.device, dtype=torch.float).unsqueeze(dim=2)
@@ -152,9 +159,9 @@ class Model(BaseAgent):
 
     def get_action(self, s, eps=0.1): #faster
         with torch.no_grad():
-            #X = torch.tensor([s], device=self.device, dtype=torch.float)
+            X = torch.tensor([s], device=self.device, dtype=torch.float)
             self.model.sample_noise()
-            a = self.model(s).max(-1)[1].view(1, -1)
+            a = self.model(X).max(-1)[1].view(1, -1)
             act = np.zeros(a.size(),dtype=np.int32)
             #for n in range(a.size()[0]): # batches
             for i in range(a.size()[1]): # diverters
