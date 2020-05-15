@@ -104,15 +104,6 @@ class Model(BaseAgent):
 
         #estimate
         self.model.sample_noise()
-        #batch_list = []
-        #for n in range(batch_state.shape[0]):
-        #    data = Data(x=batch_state[n],edge_index=s_.edge_index)
-        #    batch_list.append(data)
-        #batch_state = Batch()
-        #batch_state = batch_state.from_data_list(list(batch_list))
-        #print(non_final_next_states.shape)
-        #print(batch_action.shape)
-        #batch_state = Data(x=batch_state, edge_index=s_.edge_index)
         current_q_values = torch.sum(self.model(batch_state).gather(-1, batch_action), dim=-1)
         #target
         with torch.no_grad():
