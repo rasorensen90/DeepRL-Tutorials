@@ -114,7 +114,7 @@ class Model(BaseAgent):
                 max_next_q_values[non_final_mask] = self.target_model(non_final_next_states).gather(-1, max_next_action)
             expected_q_values = batch_reward + ((self.gamma**self.nsteps)*torch.sum(max_next_q_values, dim=-1))
 
-        diff = (expected_q_values - current_q_values)
+        diff = torch.mean(torch.abs((expected_q_values - current_q_values)), dim=-1)
         if self.priority_replay:
             self.memory.update_priorities(indices, diff.detach().squeeze().abs().cpu().numpy().tolist())
             loss = self.MSE(diff).squeeze() * weights
