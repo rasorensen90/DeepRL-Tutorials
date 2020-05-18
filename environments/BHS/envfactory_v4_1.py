@@ -9,6 +9,7 @@ import networkx as nx
 import numpy as np
 import scipy
 import torch
+import dgl
 #import pylab as plt
 #from networkx.drawing.nx_agraph import graphviz_layout, to_agraph
 #import pygraphviz as pgv
@@ -290,7 +291,9 @@ def env_2_0(): #101 elements
     connect(elements[P6_o1_0],0,elements[P5_i],1,graph)
     
     GCNMat = createGCNMat(graph)
+    
     edgelist = createEdgelist(graph)
+    graph = dgl.DGLGraph(graph)
     #[print(e.ID, e.__class__.__name__) for e in elements]
 #    nx.draw_spectral(graph)
 #    plt.show()
