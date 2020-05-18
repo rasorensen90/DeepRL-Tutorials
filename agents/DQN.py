@@ -3,7 +3,6 @@ import numpy as np
 import torch
 import torch.optim as optim
 import gym
-from torch_geometric.data import Data, Batch
 from agents.BaseAgent import BaseAgent
 from networks.networks import DQN
 from networks.network_bodies import AtariBody, SimpleBody
