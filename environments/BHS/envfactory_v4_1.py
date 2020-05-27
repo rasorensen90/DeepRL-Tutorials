@@ -80,9 +80,12 @@ def env_0_0(): #16 elements
     src = [0]
     dst = [3,7,9,14]
     
-    GCNMat = createGCNMat(graph)
+    #GCNMat = createGCNMat(graph)
+    
+    edgelist = createEdgelist(graph)
+    graph = dgl.DGLGraph(graph)
     print('Number of elements in environment: ', len(elements))
-    return elements, dst, src, graph, GCNMat
+    return elements, dst, src, graph, edgelist
 
 def env_1_0(): #34 elements
     graph = nx.DiGraph()
@@ -135,10 +138,12 @@ def env_1_0(): #34 elements
     src = [P0]
     dst = [P1, P2, P3, P4, P5]
     
-    GCNMat = createGCNMat(graph)
+    #GCNMat = createGCNMat(graph)
     
+    edgelist = createEdgelist(graph)
+    graph = dgl.DGLGraph(graph)
     print('Number of elements in environment: ', len(elements))
-    return elements, dst, src, graph, GCNMat
+    return elements, dst, src, graph, edgelist
 
 
 def env_2_0(): #101 elements
@@ -290,13 +295,13 @@ def env_2_0(): #101 elements
     P6_o1_0 = elements[-1].ID
     connect(elements[P6_o1_0],0,elements[P5_i],1,graph)
     
-    GCNMat = createGCNMat(graph)
-    
-    edgelist = createEdgelist(graph)
-    graph = dgl.DGLGraph(graph)
+    #GCNMat = createGCNMat(graph)
     #[print(e.ID, e.__class__.__name__) for e in elements]
 #    nx.draw_spectral(graph)
 #    plt.show()
+
+    edgelist = createEdgelist(graph)
+    graph = dgl.DGLGraph(graph)
     print('Number of elements in environment: ', len(elements))
     return elements, dst, src, graph, edgelist
 
@@ -510,14 +515,17 @@ def env_3_0(): #265 elements
     src = [P0_i,P1_i,P2_i,P3_i]
     dst = [P20,P21]
     
-    for e in elements:
-        print(e.ID, e.__class__.__name__) 
-    GCNMat = createGCNMat(graph)
+    #for e in elements:
+    #    print(e.ID, e.__class__.__name__) 
+    #GCNMat = createGCNMat(graph)
 #    pos = nx.nx_pydot.graphviz_layout(graph, prog='dot')
 #    nx.draw(graph,pos=pos)
 #    plt.show()
+
+    edgelist = createEdgelist(graph)
+    graph = dgl.DGLGraph(graph)
     print('Number of elements in environment: ', len(elements))
-    return elements, dst, src, graph, GCNMat
+    return elements, dst, src, graph, edgelist
 
 
 #elems = [Element(ID=i) for i in range(6)]
