@@ -16,7 +16,7 @@ from .SPGraph import SPGraph, dijsktra
 class Environment(gym.Env):
     def __init__(self, args):
         
-        self.elems, self.dst, self.src, self.graph, self.edgelist = globals()[args.envtype]()
+        self.elems, self.dst, self.src, self.graph, self.GCNMat = globals()[args.envtype]()
         self.totes = []
         self.reward = 0
         self.action_space = []
@@ -157,11 +157,15 @@ class Environment(gym.Env):
         
         [[graph.add_edge(e.ID, e_out.ID, e.cost[e.outputElements.index(e_out)]) for e_out in e.outputElements] for e in self.elems]
         
-        shortestPathTable = np.zeros([len([e for e in self.elems if isinstance(e, Diverter)]),len(self.src+self.dst)])
-
-        for n_src in [e.ID for e in self.elems if isinstance(e, Diverter)]:
+        shortestPathTable = np.zeros([len(self.diverters),len(self.src+self.dst)])
+        eID_src = [e.ID for e in self.diverters]
+        eID_dst = self.src + self.dst
+        
+        eID = [e.ID for e in self.elems]
+        
+        for n_src in eID_src:
             _,path = dijsktra(graph,n_src)
-            for n_dst in [e.ID for e in self.elems if e.ID in self.src or e.ID in self.dst]:
+            for n_dst in eID_dst:
                 k=n_dst
                 k_new = k
                 while k_new != n_src:
@@ -171,27 +175,27 @@ class Environment(gym.Env):
                         k = k_new
                     if k == n_dst or k == None:
                         break
-                ctrl = 0
-                for e in [e for e in self.elems if e.ID == n_src]:
-                    for e_out in[e_out for e_out in e.outputElements if e_out.ID == k]:
-                        ctrl = e.outputElements.index(e_out)
-                        eID_src = [e.ID for e in self.elems if isinstance(e, Diverter)].index(n_src)
-                        eID_dst = [e.ID for e in self.elems if e.ID in self.src or e.ID in self.dst].index(n_dst)
-                        shortestPathTable[eID_src,eID_dst] = ctrl
+                
+                e = self.elems[eID.index(n_src)]
+                e_out = [e_out for e_out in e.outputElements if e_out.ID == k][0]
+                ctrl = e.outputElements.index(e_out)
+
+                shortestPathTable[eID_src.index(n_src),eID_dst.index(n_dst)] = ctrl
         return shortestPathTable
     
     def calcShortestPath(self, dynamic=False, dla=False, maxCongestion=1.0):
         if (dynamic):
             self.checkForCongestion(dla=dla, maxCongestion=maxCongestion)
         action = []
-        for e in [e for e in self.elems if isinstance(e, Diverter)]:
-            eID_src = [e.ID for e in self.elems if isinstance(e, Diverter)].index(e.ID)
+        eID_src = [e.ID for e in self.diverters]
+        for e in self.diverters:
+            
             if e.tote is not None:
-                eID_dst = [e_.ID for e_ in self.elems if e_.ID in self.src+self.dst].index(e.tote.dst)
+                eID_dst = (self.src+self.dst).index(e.tote.dst)
             else:
                 eID_dst = 0
             if e.forced_control is None:
-                action.append(int(self.shortestPathTable[eID_src][eID_dst]))
+                action.append(int(self.shortestPathTable[eID_src.index(e.ID)][eID_dst]))
             else:
                 action.append(int(e.forced_control))
         return(action)
