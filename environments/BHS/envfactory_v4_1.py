@@ -58,6 +58,48 @@ def createEdgelist(graph):
     edge_list = torch.tensor([edge_start, edge_end], dtype=torch.long)
     return edge_list
 
+def downsample_graph(src,dst,elements,graph):    
+    mer = []
+    div = []
+    for e in elements:
+        if (e.__class__.__name__ == 'Merger'):
+            mer.append(e.ID)
+        if (e.__class__.__name__ == 'Diverter'):
+            div.append(e.ID)
+
+    down_nodes = []
+    down_nodes.extend(mer)
+    down_nodes.extend(div)
+    down_nodes.extend(dst)
+    down_nodes.extend(src)
+    down_nodes.sort()
+    nodes_on_edge = []
+    edge_nodes = []
+    edge_attr = []
+    down_graph = nx.DiGraph()
+    down_graph.add_nodes_from(down_nodes)
+    for n in down_nodes:
+        for k in graph.neighbors(n):
+            i = 0
+            while k < len(elements):
+                if (k in down_nodes):
+                    down_graph.add_edge(n,k)
+                    edge_attr.append(i)
+                    edge_nodes.append(nodes_on_edge)
+                    nodes_on_edge = []
+                    break
+                else:
+                    nodes_on_edge.append(k)
+                    i +=1
+                    for kk in graph.neighbors(k):
+                        k = kk
+    
+    nodes = dict(zip(down_graph, range(0, len(down_nodes))))
+    down_graph = nx.relabel_nodes(down_graph, nodes)
+    edgelist_down = createEdgelist(down_graph)
+    down_graph = dgl.DGLGraph(down_graph)
+    return down_graph, edgelist_down, edge_attr, edge_nodes
+
 def env_0_0(): #16 elements
     graph = nx.DiGraph()
     
@@ -295,15 +337,16 @@ def env_2_0(): #101 elements
     P6_o1_0 = elements[-1].ID
     connect(elements[P6_o1_0],0,elements[P5_i],1,graph)
     
-    #GCNMat = createGCNMat(graph)
-    #[print(e.ID, e.__class__.__name__) for e in elements]
+#    GCNMat = createGCNMat(graph)
+#    [print(e.ID, e.__class__.__name__) for e in elements]
 #    nx.draw_spectral(graph)
 #    plt.show()
 
+    down_graph, edgelist_down, edge_attr, edge_nodes = downsample_graph(src,dst,elements,graph)  
     edgelist = createEdgelist(graph)
     graph = dgl.DGLGraph(graph)
     print('Number of elements in environment: ', len(elements))
-    return elements, dst, src, graph, edgelist
+    return elements, dst, src, graph, edgelist, down_graph, edgelist_down, edge_attr, edge_nodes
 
 def env_3_0(): #265 elements
     elements = []

@@ -16,7 +16,7 @@ from .SPGraph import SPGraph, dijsktra
 class Environment(gym.Env):
     def __init__(self, args):
         
-        self.elems, self.dst, self.src, self.graph, self.GCNMat = globals()[args.envtype]()
+        self.elems, self.dst, self.src, self.graph, self.edgelist, self.down_graph, self.edgelist_down, self.edge_attr, self.edge_nodes = globals()[args.envtype]()
         self.totes = []
         self.reward = 0
         self.action_space = []
@@ -31,12 +31,13 @@ class Environment(gym.Env):
         self.rand_numtotes = random.Random(0)
         self.randomize_numtotes = args.randomize_numtotes
         self.numtotes = args.numtotes
+        self.diverters = [e for e in self.elems if isinstance(e, Diverter)]
         self.shortestPathTable = self.calcShortestPathTable()
         self.congestion = False
         self.congestion_counter = 0
         self.tote_info = {}
         self.deadlock = False
-        self.diverters = [e for e in self.elems if isinstance(e, Diverter)]
+        
         if args.RL_diverters is not None:
             self.rl_diverter_ids = list(map(int,args.RL_diverters))
         else:
