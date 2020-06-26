@@ -27,6 +27,8 @@ pip install torch-cluster==latest+cu102 -f https://pytorch-geometric.com/whl/tor
 pip install torch-spline-conv==latest+cu102 -f https://pytorch-geometric.com/whl/torch-1.5.0.html
 pip install torch-geometric
 
+conda install jupyterlab
+
 CHANGE BASELINES MONITOR.PY STEP FUNCTION LINE 57-78:
 Anaconda3\envs\BHS_Pytorch\Lib\site-packages\baselines\bench\monitor.py
 
