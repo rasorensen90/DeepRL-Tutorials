@@ -129,7 +129,7 @@ class BHSDuelingDQN(nn.Module):
 
 
 class Model(DQN_Agent):
-    def __init__(self, static_policy=False, env=None, config=None, log_dir='/tmp/GCN/'):
+    def __init__(self, static_policy=False, env=None, config=None, log_dir='tmp/GCN/'):
         super(Model, self).__init__(static_policy, env, config, log_dir=log_dir)
 
     def declare_networks(self):
@@ -145,7 +145,7 @@ class Model(DQN_Agent):
 
 start=timer()
 
-log_dir = "/tmp/GCN/"
+log_dir = "tmp/GCN/"
 try:
     os.makedirs(log_dir)
 except OSError:
@@ -221,13 +221,13 @@ for frame_idx in range(1, config.MAX_FRAMES + 1):
             print(frame_idx)
             print(time_get/args.log_interval, time_step/args.log_interval, time_update/args.log_interval)
             time_get, time_step, time_update = 0,0,0
-            plot_all_data(log_dir, env_id, 'BHSDuelingDQN', config.MAX_FRAMES, bin_size=(10, 100, 100, 1), smooth=1, time=timedelta(seconds=int(timer()-start)), save_filename='/Results/GCN/Results.svg', ipynb=False)
+            plot_all_data(log_dir, env_id, 'BHSDuelingDQN', config.MAX_FRAMES, bin_size=(10, 100, 100, 1), smooth=1, time=timedelta(seconds=int(timer()-start)), save_filename='Results/GCN/Results.svg', ipynb=False)
         except IOError:
             pass
 
 model.save_w()
 env.close()
-plot_all_data(log_dir, env_id, 'BHSDuelingDQN', config.MAX_FRAMES, bin_size=(10, 100, 100, 1), smooth=1, time=timedelta(seconds=int(timer()-start)), save_filename='/Results/GCN/Results.svg', ipynb=False)
+plot_all_data(log_dir, env_id, 'BHSDuelingDQN', config.MAX_FRAMES, bin_size=(10, 100, 100, 1), smooth=1, time=timedelta(seconds=int(timer()-start)), save_filename='Results/GCN/Results.svg', ipynb=False)
 
 
 # In[ ]:
