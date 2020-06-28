@@ -221,7 +221,7 @@ for frame_idx in range(1, config.MAX_FRAMES + 1):
             print(frame_idx)
             print(time_get/args.log_interval, time_step/args.log_interval, time_update/args.log_interval)
             time_get, time_step, time_update = 0,0,0
-            plot_all_data(log_dir, env_id, 'BHSDuelingDQN', config.MAX_FRAMES, bin_size=(10, 100, 100, 1), smooth=1, time=timedelta(seconds=int(timer()-start)), save_filename='/Results/GCN/Results.png', ipynb=False)
+            plot_all_data(log_dir, env_id, 'BHSDuelingDQN', config.MAX_FRAMES, bin_size=(10, 100, 100, 1), smooth=1, time=timedelta(seconds=int(timer()-start)), save_filename='/Results/GCN/Results.svg', ipynb=False)
         except IOError:
             pass
 
