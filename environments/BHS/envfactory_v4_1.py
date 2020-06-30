@@ -98,7 +98,7 @@ def downsample_graph(src,dst,elements,graph):
     down_graph = nx.relabel_nodes(down_graph, nodes)
     edgelist_down = createEdgelist(down_graph)
     down_graph = dgl.DGLGraph(down_graph)
-    return down_graph, edgelist_down, edge_attr, edge_nodes
+    return down_graph, edgelist_down, edge_attr, edge_nodes, down_nodes
 
 def env_0_0(): #16 elements
     graph = nx.DiGraph()
@@ -342,11 +342,11 @@ def env_2_0(): #101 elements
 #    nx.draw_spectral(graph)
 #    plt.show()
 
-    down_graph, edgelist_down, edge_attr, edge_nodes = downsample_graph(src,dst,elements,graph)  
+    down_graph, edgelist_down, edge_attr, edge_nodes, down_nodes = downsample_graph(src,dst,elements,graph)  
     edgelist = createEdgelist(graph)
     graph = dgl.DGLGraph(graph)
     print('Number of elements in environment: ', len(elements))
-    return elements, dst, src, graph, edgelist, down_graph, edgelist_down, edge_attr, edge_nodes
+    return elements, dst, src, graph, edgelist, down_graph, edgelist_down, edge_attr, edge_nodes, down_nodes
 
 def env_3_0(): #265 elements
     elements = []
