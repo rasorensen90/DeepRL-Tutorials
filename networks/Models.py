@@ -412,11 +412,10 @@ class BHS_TEST(nn.Module):
     def forward(self, x):        
         # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))
         x_shape = x.shape
-        
+        x = x[:x_shape[0],self.down_nodes]
         #start_down=timer()
         #x_down = torch.zeros([x_shape[0],self.input_shape[0],x_shape[2]]).to(self.device)
         #edge_occu = [0]*len(self.edge_nodes)
-        x = x[:x_shape[0],self.down_nodes]
         # for n in range(x_shape[0]):
           #  x_down[n] = x[n][nodes]
           #  for k in range(x_shape[1]):

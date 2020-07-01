@@ -13,7 +13,7 @@ import numpy as np
 
 from timeit import default_timer as timer
 from datetime import timedelta
-from environments.BHS.environment_v4_2 import Environment
+from environments.BHS.environment_v5_0 import Environment
 
 import torch
 import torch.optim as optim
