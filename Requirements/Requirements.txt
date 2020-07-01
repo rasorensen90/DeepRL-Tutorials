@@ -7,18 +7,11 @@ pip install gym
 pip install baselines
 conda update --all
 
-conda install cudatoolkit
-conda install cudnn
-conda install -c conda-forge nccl
-
 conda install pytorch torchvision cpuonly -c pytorch // https://pytorch.org/
 conda install pytorch torchvision cudatoolkit=10.2 -c pytorch
 
 https://docs.dgl.ai/install/index.html
 conda install -c dglteam dgl-cuda10.2
-
-python -c "import torch; print(torch.__version__)"
-python -c "import torch; print(torch.version.cuda)"
 
 https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html
 pip install torch-scatter==latest+cu102 -f https://pytorch-geometric.com/whl/torch-1.5.0.html
