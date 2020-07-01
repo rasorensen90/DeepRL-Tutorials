@@ -389,14 +389,14 @@ class BHS_NN(nn.Module):
         pass
 
 class BHS_TEST(nn.Module):
-    def __init__(self, input_shape, num_outputs, graph, edgelist, edge_attr, edge_nodes, down_nodes):
+    def __init__(self, input_shape, num_outputs, graph, edgelist, edge_attr, down_nodes):
         super(BHS_TEST, self).__init__()
         self.input_shape = list(input_shape)
         self.input_shape[0] = graph.number_of_nodes()
         self.num_actions = num_outputs # a vector of the number of actions at each diverter
         self.edge = edgelist
         self.edge_attr = edge_attr
-        self.edge_nodes = edge_nodes
+        #self.edge_nodes = edge_nodes
         self.down_nodes = down_nodes
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
@@ -414,13 +414,11 @@ class BHS_TEST(nn.Module):
         x_shape = x.shape
         
         #start_down=timer()
-        nodes = np.zeros((len(self.down_nodes), x_shape[1]))
-        nodes[np.arange(len(self.down_nodes)),self.down_nodes] = 1
-        nodes = torch.BoolTensor(sum(nodes))
-        x_down = torch.zeros([x_shape[0],self.input_shape[0],x_shape[2]])
-        edge_occu = [0]*len(self.edge_nodes)
-        for n in range(x_shape[0]):
-            x_down[n] = x[n][nodes]
+        #x_down = torch.zeros([x_shape[0],self.input_shape[0],x_shape[2]]).to(self.device)
+        #edge_occu = [0]*len(self.edge_nodes)
+        x = x[:x_shape[0],self.down_nodes]
+        # for n in range(x_shape[0]):
+          #  x_down[n] = x[n][nodes]
           #  for k in range(x_shape[1]):
           #      for e in range(len(self.edge_nodes)):
           #          if k in self.edge_nodes[e]:
@@ -428,13 +426,13 @@ class BHS_TEST(nn.Module):
           #                  edge_occu[e] += 1
           #              break
 
-        edge_attr = torch.Tensor(list(np.array(self.edge_attr) - np.array(edge_occu))).to(self.device)
-        x_shape = x_down.shape
-        x = x_down.view(x_shape[0]*x_shape[1],x_shape[2]).to(self.device) # set shape of x to [N*H, C] to get the shape of a Graph batch
+        #edge_attr = torch.Tensor(list(np.array(self.edge_attr) - np.array(edge_occu))).to(self.device)
+        #x_shape = x_down.shape
+        x = x.view(x_shape[0]*x_shape[1],x_shape[2]) # set shape of x to [N*H, C] to get the shape of a Graph batch
         #time_down = timer()-start_down
         #print('TIME DOWN = ',time_down, x_shape[0])
         
-        x = F.relu(self.conv1(x, self.edge, edge_attr))
+        x = F.relu(self.conv1(x, self.edge, self.edge_attr))
         
         x = x.view(x_shape[0], -1) # set shape of x to [N,:] to keep the batch size
         

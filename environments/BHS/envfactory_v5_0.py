@@ -98,6 +98,10 @@ def downsample_graph(src,dst,elements,graph):
     down_graph = nx.relabel_nodes(down_graph, nodes)
     edgelist_down = createEdgelist(down_graph)
     down_graph = dgl.DGLGraph(down_graph)
+    nodes = np.zeros((len(down_nodes), x_shape[1]))
+    nodes[np.arange(len(self.down_nodes)),self.down_nodes] = 1
+    down_nodes = torch.BoolTensor(sum(nodes))
+    edge_attr = torch.Tensor(edge_attr)
     return down_graph, edgelist_down, edge_attr, edge_nodes, down_nodes
 
 def env_0_0(): #16 elements
