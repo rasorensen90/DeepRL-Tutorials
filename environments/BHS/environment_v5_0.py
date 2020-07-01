@@ -6,7 +6,7 @@ Created on Wed May 29 09:37:43 2019
 """
 import random
 import numpy as np
-from .envfactory_v4_1 import env_0_0, env_1_0, env_2_0, env_3_0
+from .envfactory_v5_0 import env_0_0, env_1_0, env_2_0, env_3_0
 from .Element import Element, Diverter, Merger, Toploader
 from .Tote import Tote
 import gym
