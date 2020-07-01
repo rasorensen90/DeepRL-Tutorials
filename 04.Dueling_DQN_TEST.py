@@ -77,7 +77,7 @@ config.ACTION_SELECTION_COUNT_FREQUENCY = 1000
 
 
 class BHSDuelingDQN(nn.Module):
-    def __init__(self, input_shape, num_outputs, graph, edgelist, edge_attr, edge_nodes):
+    def __init__(self, input_shape, num_outputs, graph, edgelist, edge_attr, edge_nodes, down_nodes):
         super(BHSDuelingDQN, self).__init__()
         self.input_shape = list(input_shape)
         self.input_shape[0] = graph.number_of_nodes()
@@ -85,7 +85,7 @@ class BHSDuelingDQN(nn.Module):
         self.edge = edgelist
         self.edge_attr = edge_attr
         self.edge_nodes = edge_nodes
-        
+        self.down_nodes = down_nodes
         nn1 = nn.Sequential(nn.Linear(1, 64), nn.ReLU(), nn.Linear(64, self.input_shape[1]*128)) # edge attribute neural network
         self.conv1 = NNConv(self.input_shape[1], 128, nn1)
         
@@ -100,21 +100,19 @@ class BHSDuelingDQN(nn.Module):
         x_shape = x.shape
         
         #start_down=timer()
+        nodes = np.zeros((len(self.down_nodes), x_shape[1]))
+        nodes[np.arange(len(self.down_nodes)),self.down_nodes] = 1
+        nodes = torch.BoolTensor(sum(nodes))
         x_down = torch.zeros([x_shape[0],self.input_shape[0],x_shape[2]])
         edge_occu = [0]*len(self.edge_nodes)
         for n in range(x_shape[0]):
-            i = 0
-            for k in range(x_shape[1]):
-                if (k in self.edge):
-                    x_down[n][i] = x[n][k]
-                    i += 1
-                    break
-          #      else:
-          #          for e in range(len(self.edge_nodes)):
-          #              if k in self.edge_nodes[e]:
-          #                  if len(torch.nonzero(x[n][k],as_tuple=False)) != 0:
-          #                      edge_occu[e] += 1
-          #                  break
+            x_down[n] = x[n][nodes]
+          #  for k in range(x_shape[1]):
+          #      for e in range(len(self.edge_nodes)):
+          #          if k in self.edge_nodes[e]:
+          #              if len(torch.nonzero(x[n][k],as_tuple=False)) != 0:
+          #                  edge_occu[e] += 1
+          #              break
 
         edge_attr = torch.Tensor(list(np.array(self.edge_attr) - np.array(edge_occu)))
         x_shape = x_down.shape
@@ -163,8 +161,9 @@ class Model(DQN_Agent):
         edgelist = self.env.edgelist_down.to(self.device)
         edge_attr = self.env.edge_attr
         edge_nodes = self.env.edge_nodes
-        self.model = BHSDuelingDQN(self.env.observation_space.shape, self.env.action_space.nvec, graph, edgelist, edge_attr, edge_nodes)
-        self.target_model = BHSDuelingDQN(self.env.observation_space.shape, self.env.action_space.nvec, graph, edgelist, edge_attr, edge_nodes)
+        down_nodes = self.env.down_nodes
+        self.model = BHSDuelingDQN(self.env.observation_space.shape, self.env.action_space.nvec, graph, edgelist, edge_attr, edge_nodes, down_nodes)
+        self.target_model = BHSDuelingDQN(self.env.observation_space.shape, self.env.action_space.nvec, graph, edgelist, edge_attr, edge_nodes, down_nodes)
 
 
 #  ## Training Loop
