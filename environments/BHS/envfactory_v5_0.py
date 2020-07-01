@@ -98,9 +98,9 @@ def downsample_graph(src,dst,elements,graph):
     down_graph = nx.relabel_nodes(down_graph, nodes)
     edgelist_down = createEdgelist(down_graph)
     down_graph = dgl.DGLGraph(down_graph)
-    nodes = np.zeros((len(down_nodes), len(graph)))
-    nodes[np.arange(len(down_nodes)),down_nodes] = 1
-    down_nodes = torch.BoolTensor(sum(nodes))
+    #nodes = np.zeros((len(down_nodes), len(graph)))
+    #nodes[np.arange(len(down_nodes)),down_nodes] = 1
+    #down_nodes = torch.BoolTensor(sum(nodes))
     edge_attr = torch.Tensor(edge_attr)
     return down_graph, edgelist_down, edge_attr, edge_nodes, down_nodes
 

@@ -389,16 +389,12 @@ class BHS_NN(nn.Module):
         pass
 
 class BHS_TEST(nn.Module):
-    def __init__(self, input_shape, num_outputs, graph, edgelist, edge_attr, down_nodes):
+    def __init__(self, input_shape, num_outputs, edgelist, edge_attr):
         super(BHS_TEST, self).__init__()
-        self.input_shape = list(input_shape)
-        self.input_shape[0] = graph.number_of_nodes()
+        self.input_shape = input_shape
         self.num_actions = num_outputs # a vector of the number of actions at each diverter
         self.edge = edgelist
         self.edge_attr = edge_attr
-        #self.edge_nodes = edge_nodes
-        self.down_nodes = down_nodes
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
         nn1 = nn.Sequential(nn.Linear(1, 64), nn.ReLU(), nn.Linear(64, self.input_shape[1]*128)) # edge attribute neural network
         self.conv1 = NNConv(self.input_shape[1], 128, nn1)
@@ -412,7 +408,7 @@ class BHS_TEST(nn.Module):
     def forward(self, x):        
         # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))
         x_shape = x.shape
-        x = x[:x_shape[0],self.down_nodes]
+        #x = x[:x_shape[0],self.down_nodes]
         #start_down=timer()
         #x_down = torch.zeros([x_shape[0],self.input_shape[0],x_shape[2]]).to(self.device)
         #edge_occu = [0]*len(self.edge_nodes)
@@ -427,9 +423,10 @@ class BHS_TEST(nn.Module):
 
         #edge_attr = torch.Tensor(list(np.array(self.edge_attr) - np.array(edge_occu))).to(self.device)
         #x_shape = x_down.shape
-        x = x.view(x_shape[0]*x.shape[1],x_shape[2]) # set shape of x to [N*H, C] to get the shape of a Graph batch
+        
         #time_down = timer()-start_down
         #print('TIME DOWN = ',time_down, x_shape[0])
+        x = x.view(x_shape[0]*x_shape[1],x_shape[2]) # set shape of x to [N*H, C] to get the shape of a Graph batch
         
         x = F.relu(self.conv1(x, self.edge, self.edge_attr))
         
@@ -456,3 +453,4 @@ class BHS_TEST(nn.Module):
     def sample_noise(self):
         #ignore this for now
         pass
+    

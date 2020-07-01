@@ -16,7 +16,7 @@ from .SPGraph import SPGraph, dijsktra
 class Environment(gym.Env):
     def __init__(self, args):
         
-        self.elems, self.dst, self.src, self.graph, self.edgelist, self.down_graph, self.edgelist_down, self.edge_attr, self.edge_nodes, self.down_nodes= globals()[args.envtype]()
+        self.elems, self.dst, self.src, self.graph, self.edgelist, self.down_graph, self.edgelist_down, self.edge_attr, self.edge_nodes, self.down_nodes = globals()[args.envtype]()
         self.totes = []
         self.reward = 0
         self.action_space = []
@@ -37,6 +37,10 @@ class Environment(gym.Env):
         self.congestion_counter = 0
         self.tote_info = {}
         self.deadlock = False
+        if (args.network == "TEST"):
+            self.nodes = self.down_nodes
+        else:
+            self.nodes = [*range(len(self.elems))]
         
         if args.RL_diverters is not None:
             self.rl_diverter_ids = list(map(int,args.RL_diverters))
@@ -235,6 +239,7 @@ class Environment(gym.Env):
         self.updateObs()
         self.congestion=False
         self.done = False
+        self.obs = self.obs[self.nodes]
         return self.obs
     
     def findSPdiverters(self, load_based=False):
@@ -306,5 +311,5 @@ class Environment(gym.Env):
         self.stepnumber += 1
         if (self.stepnumber >= self.steplimit):
             self.done = True
+        self.obs = self.obs[self.nodes]
         return self.obs, reward, self.done, tote_info, action_
-
