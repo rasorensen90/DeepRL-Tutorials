@@ -428,7 +428,7 @@ class BHS_TEST(nn.Module):
 
         #edge_attr = torch.Tensor(list(np.array(self.edge_attr) - np.array(edge_occu))).to(self.device)
         #x_shape = x_down.shape
-        x = x.view(x_shape[0]*x_shape[1],x_shape[2]) # set shape of x to [N*H, C] to get the shape of a Graph batch
+        x = x.view(x_shape[0]*x.shape[1],x_shape[2]) # set shape of x to [N*H, C] to get the shape of a Graph batch
         #time_down = timer()-start_down
         #print('TIME DOWN = ',time_down, x_shape[0])
         
