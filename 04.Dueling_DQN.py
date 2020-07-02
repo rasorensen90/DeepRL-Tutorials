@@ -148,8 +148,10 @@ time = '{date:%Y-%m-%d-%H}'.format(date=datetime.datetime.now())
 print(time)
 
 log_dir = "tmp/" + network + "/"
-filename = "Results/" + network + "/" + network + "_" + time
+res_dir = "Results/" + network + "/"
+filename = res_dir + network + "_" + time
 try:
+    os.makedirs(res_dir, exist_ok = True)
     os.makedirs(log_dir)
 except OSError:
     files = glob.glob(os.path.join(log_dir, '*.monitor.csv'))         + glob.glob(os.path.join(log_dir, '*td.csv'))         + glob.glob(os.path.join(log_dir, '*sig_param_mag.csv'))         + glob.glob(os.path.join(log_dir, '*action_log.csv'))
