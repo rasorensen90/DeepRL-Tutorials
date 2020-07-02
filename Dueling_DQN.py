@@ -10,6 +10,7 @@
 
 import gym, math, glob, sys
 import numpy as np
+import datetime
 
 from timeit import default_timer as timer
 from datetime import timedelta
@@ -123,13 +124,10 @@ class Model(DQN_Agent):
             self.target_model = BHS_NN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist, edge_attr)
         elif (self.network == "TEST"):
             print("Model =", self.network)
-            graph = self.env.down_graph.to(self.device)
             edgelist = self.env.edgelist_down.to(self.device)
             edge_attr = self.env.edge_attr.to(self.device)
-            #edge_nodes = self.env.edge_nodes
-            down_nodes = self.env.down_nodes.to(self.device)
-            self.model = BHS_TEST(self.env.observation_space.shape, self.env.action_space.nvec, graph, edgelist, edge_attr, down_nodes)
-            self.target_model = BHS_TEST(self.env.observation_space.shape, self.env.action_space.nvec, graph, edgelist, edge_attr, down_nodes)
+            self.model = BHS_TEST([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist, edge_attr)
+            self.target_model = BHS_TEST([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist, edge_attr)
 
 
 #  ## Training Loop
@@ -140,12 +138,17 @@ class Model(DQN_Agent):
 start=timer()
 
 if (get_ipython().__class__.__name__ == "ZMQInteractiveShell"):
-    network = "GAT" 
-else:
+    network = "NN"
+elif (len(sys.argv) > 1):
     network = sys.argv[1]
-    
+else:
+    network = "GCN"
+
+time = '{date:%Y-%m-%d-%H}'.format(date=datetime.datetime.now())
+print(time)
+
 log_dir = "tmp/" + network + "/"
-save_filename="Results/" + network + "/Results.svg"
+filename = "Results/" + network + "/" + network + "_" + time
 try:
     os.makedirs(log_dir)
 except OSError:
@@ -166,6 +169,7 @@ class Arg_parser():
         self.numtotes = 30
         self.randomize_numtotes = False
         self.RL_diverters = None
+        self.network = network
     
 args = Arg_parser()
 
@@ -215,19 +219,19 @@ for frame_idx in range(1, config.MAX_FRAMES + 1):
     
     
     if frame_idx % args.log_interval == 0:
-        model.save_w()
+        torch.save(model.get_state_dict(), filename + ".pt") #model.save_w()
         try:
             clear_output(True)
             print(frame_idx)
             print(time_get/args.log_interval, time_step/args.log_interval, time_update/args.log_interval)
             time_get, time_step, time_update = 0,0,0
-            plot_all_data(log_dir, env_id, 'BHSDuelingDQN', config.MAX_FRAMES, bin_size=(10, 100, 100, 1), smooth=1, time=timedelta(seconds=int(timer()-start)), save_filename=save_filename, ipynb=False)
+            plot_all_data(log_dir, env_id, 'BHSDuelingDQN', config.MAX_FRAMES, bin_size=(10, 100, 100, 1), smooth=1, time=timedelta(seconds=int(timer()-start)), save_filename=filename+".svg", ipynb=False)
         except IOError:
             pass
 
-model.save_w()
+torch.save(model.get_state_dict(), filename + ".pt") #model.save_w()
 env.close()
-plot_all_data(log_dir, env_id, 'BHSDuelingDQN', config.MAX_FRAMES, bin_size=(10, 100, 100, 1), smooth=1, time=timedelta(seconds=int(timer()-start)), save_filename=save_filename, ipynb=False)
+plot_all_data(log_dir, env_id, 'BHSDuelingDQN', config.MAX_FRAMES, bin_size=(10, 100, 100, 1), smooth=1, time=timedelta(seconds=int(timer()-start)), save_filename=filename+".svg", ipynb=False)
 
 
 # In[ ]:

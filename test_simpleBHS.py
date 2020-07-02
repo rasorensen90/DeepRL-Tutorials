@@ -7,12 +7,99 @@ import os
 import sys
 sys.path.append('./lib')
 import numpy as np
-import datetime
 import csv
+import torch, math
 from utils import logger
-from Dueling_DQN import Model
 from environments.BHS.environment_v5_0 import Environment
+from agents.DQN import Model as DQN_Agent
+from networks.Models import BHSDuelingDQN, BHS_GCN, BHS_SGN, BHS_GIN, BHS_SAGE, BHS_GAT, BHS_GGNN, BHS_NN, BHS_TEST
+from utils.hyperparameters import Config
 import time
+
+config = Config()
+
+config.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+#epsilon variables
+config.epsilon_start = 1.0
+config.epsilon_final = 0.01
+config.epsilon_decay = 300000
+config.epsilon_by_frame = lambda frame_idx: config.epsilon_final + (config.epsilon_start - config.epsilon_final) * math.exp(-1. * frame_idx / config.epsilon_decay)
+
+#misc agent variables
+config.GAMMA=0.99
+config.LR=1e-4
+config.USE_PRIORITY_REPLAY = True
+
+#memory
+config.TARGET_NET_UPDATE_FREQ = 1000
+config.EXP_REPLAY_SIZE = 50000
+config.BATCH_SIZE = 32
+
+#Learning control variables
+config.LEARN_START = 100
+config.MAX_FRAMES=1000000
+config.UPDATE_FREQ = 1
+
+#Nstep controls
+config.N_STEPS=5
+
+#data logging parameters
+config.ACTION_SELECTION_COUNT_FREQUENCY = 1000
+
+class Model(DQN_Agent):
+    def __init__(self, static_policy=False, env=None, config=None, log_dir='tmp/gym/', network ="DQN"):
+        self.network = network
+        super(Model, self).__init__(static_policy, env, config, log_dir=log_dir)
+
+    def declare_networks(self):
+        if (self.network == "DQN"):
+            print("Model =", self.network)
+            self.model = BHSDuelingDQN(self.env.observation_space.shape, self.env.action_space.nvec)
+            self.target_model = BHSDuelingDQN(self.env.observation_space.shape, self.env.action_space.nvec)
+        elif (self.network == "GCN"):
+            print("Model =", self.network)
+            edgelist = self.env.edgelist.to(self.device)
+            self.model = BHS_GCN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+            self.target_model = BHS_GCN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+        elif (self.network == "GAT"):
+            print("Model =", self.network)
+            edgelist = self.env.edgelist.to(self.device)
+            self.model = BHS_GAT(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+            self.target_model = BHS_GAT(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+        elif (self.network == "SGN"):
+            print("Model =", self.network)
+            edgelist = self.env.edgelist.to(self.device)
+            self.model = BHS_SGN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+            self.target_model = BHS_SGN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+        elif (self.network == "GGNN"):
+            print("Model =", self.network)
+            edgelist = self.env.edgelist.to(self.device)
+            self.model = BHS_GGNN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+            self.target_model = BHS_GGNN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+        elif (self.network == "SAGE"):
+            print("Model =", self.network)
+            graph = self.env.graph.to(self.device)
+            self.model = BHS_SAGE(self.env.observation_space.shape, self.env.action_space.nvec, graph)
+            self.target_model = BHS_SAGE(self.env.observation_space.shape, self.env.action_space.nvec, graph)
+        elif (self.network == "GIN"):
+            print("Model =", self.network)
+            edgelist = self.env.edgelist.to(self.device)
+            self.model = BHS_GIN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+            self.target_model = BHS_GIN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+        elif (self.network == "NN"):
+            print("Model =", self.network)
+            edgelist = self.env.edgelist.to(self.device)
+            edge_attr = torch.ones([edgelist.shape[1]],dtype=torch.float).to(self.device)
+            self.model = BHS_NN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist, edge_attr)
+            self.target_model = BHS_NN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist, edge_attr)
+        elif (self.network == "TEST"):
+            print("Model =", self.network)
+            edgelist = self.env.edgelist_down.to(self.device)
+            edge_attr = self.env.edge_attr.to(self.device)
+            self.model = BHS_TEST([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist, edge_attr)
+            self.target_model = BHS_TEST([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist, edge_attr)
+
 
 
 def writeToteInfo(toteInfo, writedir, controlMethod, numtotes, iteration):
@@ -58,7 +145,7 @@ def main(args):
     envsize= len(env.elems)
     log_dir = "Results/" + args.network + "/"
     date_time = args.load_from_model
-    model  = Model(env=env, log_dir=log_dir, network=args.network)
+    model  = Model(env=env, config=config, network=args.network)
     model.load_model_dict(log_dir + args.network + "_" + date_time + ".pt")
     base_directory = log_dir + "test/"
     logdir = base_directory + date_time + "/"
@@ -294,14 +381,15 @@ if __name__ == '__main__':
     parser.add_argument('--envtype', type=str, default='env_2_0')
     parser.add_argument('--steplimit', type=int, default=200)
     parser.add_argument('--iterations', type=int, default=100)
-    parser.add_argument('--load_from_model', type=str, default="2020-07-02-14")
-    parser.add_argument('--network', type=str, default="DQN")
+    parser.add_argument('--load_from_model', type=str, default="2020-07-02-15")
+    parser.add_argument('--network', type=str, default="GCN")
     parser.add_argument('--numtotes', type=int, default=1)
     parser.add_argument('--RL_only', type=str2bool, default=True)
     parser.add_argument('--detailed_log', type=str2bool, default=True)
     parser.add_argument('--no_render', type=str2bool, default=True)
     parser.add_argument('--randomize_numtotes', type=str2bool, default=False)
     parser.add_argument('--gpu', type=str, default='0')
+    parser.add_argument('--RL_diverters', type=str, default=None)
     
     args = parser.parse_args()
     main(args)
