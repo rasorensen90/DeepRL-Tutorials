@@ -56,7 +56,7 @@ def main(args):
     
     env = Environment(args)
     envsize= len(env.elems)
-    log_dir = "tmp/" + args.network + "/"
+    log_dir = "Results/" + args.network + "/"
     date_time = args.load_from_model
     model  = Model(env=env, log_dir=log_dir, network=args.network)
     model.load_model_dict(log_dir + args.network + "_" + date_time + ".pt")
