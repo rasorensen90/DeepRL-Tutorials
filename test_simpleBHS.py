@@ -180,7 +180,7 @@ def main(args):
                 if not args.no_render:
                     env.render()
                 start = time.time()
-                action, _ = model.predict(obs)
+                action, _ = model.get_action(obs)
                 end = time.time()
                 prediction_time.append(end-start)
 #                obs, RLRew, done, tote_info = env.step(action, shortestPath=False, dynamic=False, dla=False)
