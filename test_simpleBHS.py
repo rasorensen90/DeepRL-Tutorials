@@ -184,7 +184,7 @@ def main(args):
                 end = time.time()
                 prediction_time.append(end-start)
 #                obs, RLRew, done, tote_info = env.step(action, shortestPath=False, dynamic=False, dla=False)
-                obs, RLRew, done, tote_info = env.step(action, shortestPath=False, dynamic=False, dla=True)
+                obs, RLRew, done, tote_info = env.step(action)#, shortestPath=False, dynamic=False, dla=True)
                 RL_reward += RLRew
                 RL_steps += 1
     #        print("Episode reward", episode_rew)
