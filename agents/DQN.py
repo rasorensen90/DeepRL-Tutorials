@@ -181,3 +181,8 @@ class Model(BaseAgent):
     
     def get_state_dict(self):
         return self.model.state_dict()
+    
+    def load_model_dict(self, PATH):
+        return self.model.load_state_dict(torch.load(PATH))
+    
+    

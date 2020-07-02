@@ -9,9 +9,9 @@ sys.path.append('./lib')
 import numpy as np
 import datetime
 import csv
-from stable_baselines import logger
-from stable_baselines.deepq import DQN
-from environment_v4_0 import Environment
+from utils import logger
+from Dueling_DQN import Model
+from environments.BHS.environment_v5_0 import Environment
 import time
 
 
@@ -56,11 +56,12 @@ def main(args):
     
     env = Environment(args)
     envsize= len(env.elems)
-    model = DQN.load(args.load_from_model+".pkl", env)
-    date_time = '{date:%Y-%m-%d-%H-%M-%S}'.format( date=datetime.datetime.now())
-    instancename = args.load_from_model
-    base_directory = "test/"+instancename+"/"
-    logdir = base_directory+date_time+"/"
+    log_dir = "tmp/" + args.network + "/"
+    date_time = args.load_from_model
+    model  = Model(env=env, log_dir=log_dir, network=args.network)
+    model.load_model_dict(log_dir + args.network + "_" + date_time + ".pt")
+    base_directory = log_dir + "test/"
+    logdir = base_directory + date_time + "/"
     if not os.path.exists(logdir):
         os.makedirs(logdir)
     
@@ -293,7 +294,8 @@ if __name__ == '__main__':
     parser.add_argument('--envtype', type=str, default='env_2_0')
     parser.add_argument('--steplimit', type=int, default=200)
     parser.add_argument('--iterations', type=int, default=100)
-    parser.add_argument('--load_from_model', type=str, default="data/simpleBHS_env_2_0/2020-06-03-19-58-47/checkpoint")
+    parser.add_argument('--load_from_model', type=str, default="2020-07-02-14")
+    parser.add_argument('--network', type=str, default="DQN")
     parser.add_argument('--numtotes', type=int, default=1)
     parser.add_argument('--RL_only', type=str2bool, default=True)
     parser.add_argument('--detailed_log', type=str2bool, default=True)
