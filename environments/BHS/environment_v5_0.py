@@ -308,8 +308,9 @@ class Environment(gym.Env):
             _ = self.reset(total=True)
             self.deadlock=True
             self.done = True
+        else:
+            self.obs = self.obs[self.nodes]
         self.stepnumber += 1
         if (self.stepnumber >= self.steplimit):
             self.done = True
-        self.obs = self.obs[self.nodes]
         return self.obs, reward, self.done, tote_info, action_
