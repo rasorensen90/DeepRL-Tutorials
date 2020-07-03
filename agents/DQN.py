@@ -81,8 +81,8 @@ class Model(BaseAgent):
         transitions, indices, weights = self.memory.sample(self.batch_size)
         
         batch_state, batch_action, batch_reward, batch_next_state = zip(*transitions)
-
-        shape = (-1,)+self.num_feats
+        
+        shape = [-1,len(self.env.nodes),self.num_feats[1]]
 
         batch_state = torch.tensor(batch_state, device=self.device, dtype=torch.float).view(shape)
         batch_action = torch.tensor(batch_action, device=self.device, dtype=torch.long).squeeze().view(-1, len(self.num_actions), 1)
@@ -178,3 +178,11 @@ class Model(BaseAgent):
 
     def reset_hx(self):
         pass
+    
+    def get_state_dict(self):
+        return self.model.state_dict()
+    
+    def load_model_dict(self, PATH):
+        return self.model.load_state_dict(torch.load(PATH))
+    
+    
