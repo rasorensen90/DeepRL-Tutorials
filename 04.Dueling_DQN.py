@@ -61,7 +61,7 @@ config.BATCH_SIZE = 32
 
 #Learning control variables
 config.LEARN_START = 100
-config.MAX_FRAMES=1000000
+config.MAX_FRAMES=3000000
 config.UPDATE_FREQ = 1
 
 #Nstep controls
