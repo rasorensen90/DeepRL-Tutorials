@@ -61,7 +61,7 @@ config.BATCH_SIZE = 32
 
 #Learning control variables
 config.LEARN_START = 100
-config.MAX_FRAMES=3000000
+config.MAX_FRAMES=1000000
 config.UPDATE_FREQ = 1
 
 #Nstep controls
@@ -77,57 +77,109 @@ config.ACTION_SELECTION_COUNT_FREQUENCY = 1000
 
 
 class Model(DQN_Agent):
-    def __init__(self, static_policy=False, env=None, config=None, log_dir='tmp/gym/', network ="DQN"):
-        self.network = network
+    def __init__(self, static_policy=False, env=None, config=None, log_dir='tmp/gym/', network ="DQN", downsampled = False):
         super(Model, self).__init__(static_policy, env, config, log_dir=log_dir)
 
     def declare_networks(self):
-        if (self.network == "DQN"):
-            print("Model =", self.network)
-            self.model = BHSDuelingDQN(self.env.observation_space.shape, self.env.action_space.nvec)
-            self.target_model = BHSDuelingDQN(self.env.observation_space.shape, self.env.action_space.nvec)
-        elif (self.network == "GCN"):
-            print("Model =", self.network)
-            edgelist = self.env.edgelist.to(self.device)
-            self.model = BHS_GCN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
-            self.target_model = BHS_GCN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
-        elif (self.network == "GAT"):
-            print("Model =", self.network)
-            edgelist = self.env.edgelist.to(self.device)
-            self.model = BHS_GAT(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
-            self.target_model = BHS_GAT(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
-        elif (self.network == "SGN"):
-            print("Model =", self.network)
-            edgelist = self.env.edgelist.to(self.device)
-            self.model = BHS_SGN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
-            self.target_model = BHS_SGN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
-        elif (self.network == "GGNN"):
-            print("Model =", self.network)
-            edgelist = self.env.edgelist.to(self.device)
-            self.model = BHS_GGNN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
-            self.target_model = BHS_GGNN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
-        elif (self.network == "SAGE"):
-            print("Model =", self.network)
-            graph = self.env.graph.to(self.device)
-            self.model = BHS_SAGE(self.env.observation_space.shape, self.env.action_space.nvec, graph)
-            self.target_model = BHS_SAGE(self.env.observation_space.shape, self.env.action_space.nvec, graph)
-        elif (self.network == "GIN"):
-            print("Model =", self.network)
-            edgelist = self.env.edgelist.to(self.device)
-            self.model = BHS_GIN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
-            self.target_model = BHS_GIN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
-        elif (self.network == "NN"):
-            print("Model =", self.network)
-            edgelist = self.env.edgelist.to(self.device)
-            edge_attr = torch.ones([edgelist.shape[1]],dtype=torch.float).to(self.device)
-            self.model = BHS_NN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist, edge_attr)
-            self.target_model = BHS_NN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist, edge_attr)
-        elif (self.network == "TEST"):
-            print("Model =", self.network)
+        if (network == "DQN"):
+            print("Model =", network)
+            if (downsampled):
+                self.model = BHSDuelingDQN([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec)
+                self.target_model = BHSDuelingDQN([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec)
+            else: 
+                self.model = BHSDuelingDQN(self.env.observation_space.shape, self.env.action_space.nvec)
+                self.target_model = BHSDuelingDQN(self.env.observation_space.shape, self.env.action_space.nvec)
+            
+        elif (network == "GCN"):
+            print("Model =", network)
+            if (downsampled):
+                edgelist = self.env.edgelist_down.to(self.device)
+                self.model = BHS_GCN([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist)
+                self.target_model = BHS_GCN([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist)
+            else: 
+                edgelist = self.env.edgelist.to(self.device)
+                self.model = BHS_GCN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+                self.target_model = BHS_GCN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+                
+        elif (network == "GAT"):
+            print("Model =", network)
+            if (downsampled):
+                edgelist = self.env.edgelist_down.to(self.device)
+                self.model = BHS_GAT([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist)
+                self.target_model = BHS_GAT([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist)
+            else: 
+                edgelist = self.env.edgelist.to(self.device)
+                self.model = BHS_GAT(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+                self.target_model = BHS_GAT(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+                
+        elif (network == "SGN"):
+            print("Model =", network)
+            if (downsampled):
+                edgelist = self.env.edgelist_down.to(self.device)
+                self.model = BHS_SGN([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist)
+                self.target_model = BHS_SGN([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist)
+            else: 
+                edgelist = self.env.edgelist.to(self.device)
+                self.model = BHS_SGN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+                self.target_model = BHS_SGN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+                
+        elif (network == "GGNN"):
+            print("Model =", network)
+            if (downsampled):
+                edgelist = self.env.edgelist_down.to(self.device)
+                self.model = BHS_GGNN([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist)
+                self.target_model = BHS_GGNN([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist)
+            else: 
+                edgelist = self.env.edgelist.to(self.device)
+                self.model = BHS_GGNN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+                self.target_model = BHS_GGNN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+            
+        elif (network == "SAGE"):
+            print("Model =", network)
+            if (downsampled):
+                graph = self.env.graph_down.to(self.device)
+                self.model = BHS_SAGE([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, graph)
+                self.target_model = BHS_SAGE([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, graph)
+            else: 
+                graph = self.env.graph.to(self.device)
+                self.model = BHS_SAGE(self.env.observation_space.shape, self.env.action_space.nvec, graph)
+                self.target_model = BHS_SAGE(self.env.observation_space.shape, self.env.action_space.nvec, graph)
+            
+        elif (network == "GIN"):
+            print("Model =", network)
+            if (downsampled):
+                edgelist = self.env.edgelist_down.to(self.device)
+                self.model = BHS_GIN([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist)
+                self.target_model = BHS_GIN([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist)
+            else: 
+                edgelist = self.env.edgelist.to(self.device)
+                self.model = BHS_GIN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+                self.target_model = BHS_GIN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist)
+            
+        elif (network == "NN"):
+            print("Model =", network)
+            if (downsampled):
+                edgelist = self.env.edgelist_down.to(self.device)
+                edge_attr = self.env.edge_attr.to(self.device)
+                self.model = BHS_NN([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist, edge_attr)
+                self.target_model = BHS_NN([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist, edge_attr)
+            else: 
+                edgelist = self.env.edgelist.to(self.device)
+                edge_attr = torch.ones([edgelist.shape[1]],dtype=torch.float).to(self.device)
+                self.model = BHS_NN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist, edge_attr)
+                self.target_model = BHS_NN(self.env.observation_space.shape, self.env.action_space.nvec, edgelist, edge_attr)
+                
+        elif (network == "TEST"):
+            print("Model =", network)
             edgelist = self.env.edgelist_down.to(self.device)
             edge_attr = self.env.edge_attr.to(self.device)
             self.model = BHS_TEST([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist, edge_attr)
             self.target_model = BHS_TEST([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist, edge_attr)
+        
+        else:
+            print("Network not chosen - Choose DQN, GCN, GAT, SGN, GGNN, SAGE, GIN, NN or TEST")
+            exit()
+            
 
 
 #  ## Training Loop
@@ -138,11 +190,22 @@ class Model(DQN_Agent):
 start=timer()
 
 if (get_ipython().__class__.__name__ == "ZMQInteractiveShell"):
-    network = "NN"
-elif (len(sys.argv) > 1):
+    network = "GCN"
+    downsampled = True
+elif (len(sys.argv) > 2):
     network = sys.argv[1]
+    downsampled = sys.argv[2]
+    if (downsampled == "True"):
+        downsampled = True
+    elif (downsampled == "False"):
+        downsampled = False
+    else:
+        print("Downsampling not chosen - Choose True or False")
+        exit()
 else:
-    network = "DQN"
+    print("Network or downsampling not chosen")
+    exit()
+
 
 time = '{date:%Y-%m-%d-%H}'.format(date=datetime.datetime.now())
 print(time)
@@ -171,7 +234,7 @@ class Arg_parser():
         self.numtotes = 30
         self.randomize_numtotes = False
         self.RL_diverters = None
-        self.network = network
+        self.downsampled = downsampled
     
 args = Arg_parser()
 
@@ -180,7 +243,7 @@ env    = Environment(args) #make_atari(env_id)
 env    = bench.Monitor(env, os.path.join(log_dir, env_id))
 # env    = wrap_deepmind(env, episode_life=True, clip_rewards=True, frame_stack=False, scale=True)
 # env    = ImageToPyTorch(env)
-model  = Model(env=env, config=config, log_dir=log_dir, network=network)
+model  = Model(env=env, config=config, log_dir=log_dir, network=network, downsampled=downsampled)
 
 episode_reward = 0
 time_get, time_step, time_update = 0,0,0
