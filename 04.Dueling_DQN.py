@@ -177,8 +177,8 @@ class Model(DQN_Agent):
             self.target_model = BHS_TEST([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist, edge_attr)
         
         else:
-            print("Network not chosen - Choose DQN, GCN, GAT, SGN, GGNN, SAGE, GIN, NN or TEST")
-            exit()
+            raise ValueError("Network not chosen - Choose DQN, GCN, GAT, SGN, GGNN, SAGE, GIN, NN or TEST")
+            
             
 
 
@@ -200,11 +200,9 @@ elif (len(sys.argv) > 2):
     elif (downsampled == "False"):
         downsampled = False
     else:
-        print("Downsampling not chosen - Choose True or False")
-        exit()
+        raise ValueError("Downsampling not chosen - Choose True or False")
 else:
-    print("Network or downsampling not chosen")
-    exit()
+    raise ValueError("Network or downsampling not chosen")
 
 
 time = '{date:%Y-%m-%d-%H}'.format(date=datetime.datetime.now())
