@@ -16,7 +16,7 @@ from .SPGraph import SPGraph, dijsktra
 class Environment(gym.Env):
     def __init__(self, args):
         
-        self.elems, self.dst, self.src, self.graph, self.edgelist, self.down_graph, self.edgelist_down, self.edge_attr, self.edge_nodes, self.down_nodes = globals()[args.envtype]()
+        self.elems, self.dst, self.src, self.graph, self.edgelist, self.graph_down, self.edgelist_down, self.edge_attr, self.edge_nodes, self.nodes_down = globals()[args.envtype]()
         self.totes = []
         self.reward = 0
         self.action_space = []
@@ -37,10 +37,13 @@ class Environment(gym.Env):
         self.congestion_counter = 0
         self.tote_info = {}
         self.deadlock = False
-        if (args.network == "TEST"):
-            self.nodes = self.down_nodes
+        
+        if (args.downsampled):
+            self.nodes = self.nodes_down
         else:
             self.nodes = [*range(len(self.elems))]
+        print("Downsampled: ", args.downsampled) 
+        print("Number of nodes:", len(self.nodes))
         
         if args.RL_diverters is not None:
             self.rl_diverter_ids = list(map(int,args.RL_diverters))

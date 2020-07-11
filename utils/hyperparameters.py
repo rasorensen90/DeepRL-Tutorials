@@ -22,7 +22,7 @@ class Config(object):
 
         #algorithm control
         self.USE_NOISY_NETS=False
-        self.USE_PRIORITY_REPLAY=False
+        self.USE_PRIORITY_REPLAY=True
         
         #Multi-step returns
         self.N_STEPS = 1
@@ -49,7 +49,7 @@ class Config(object):
         self.SIGMA_INIT=0.5
 
         #Learning control variables
-        self.LEARN_START = 10000
+        self.LEARN_START = 100
         self.MAX_FRAMES=100000
         self.UPDATE_FREQ = 1
 

@@ -359,7 +359,7 @@ class BHS_NN(nn.Module):
 
     def forward(self, x):        
         # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))
-        x_shape = x.shape 
+        x_shape = x.shape
         x = x.view(x_shape[0]*x_shape[1],x_shape[2]) # set shape of x to [N*H, C] to get the shape of a Graph batch
         
         x = F.relu(self.conv1(x, self.edge, self.edge_attr))
