@@ -453,4 +453,67 @@ class BHS_TEST(nn.Module):
     def sample_noise(self):
         #ignore this for now
         pass
+
+class BHS_GCN_DQN(nn.Module):
+    def __init__(self, input_shape, num_outputs, edgelist):
+        super(BHS_GCN_DQN, self).__init__()
+        self.input_shape = input_shape
+        self.num_actions = num_outputs # a vector of the number of actions at each diverter
+        self.edge = edgelist       
+
+        self.conv1 = GCNConv(self.input_shape[1], 128)
+        self.conv2_1 = GCNConv(128, 64)
+        self.conv2_2 = GCNConv(128, 64)
+        self.conv2_3 = GCNConv(128, 64)
+
+        self.conv3 = GCNConv(64*3, 128)
+        self.conv4 = GCNConv(128, 128)
+        self.conv5 = GCNConv(128, 128)
+        
+        self.adv = nn.Linear(self.feature_size(), sum(self.num_actions)) # Might be an idea to add another fc layer here
+
+        self.val1 = nn.Linear(self.feature_size(), 64)
+        self.val2 = nn.Linear(64, 64)
+        self.val3 = nn.Linear(64, len(self.num_actions))
+
+    def forward(self, x):        
+        # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))
+        x_shape = x.shape 
+        x = x.view(x_shape[0]*x_shape[1],x_shape[2]) # set shape of x to [N*H, C] to get the shape of a Graph batch
+        
+        x = F.relu(self.conv1(x, self.edge))
+        x1 = F.relu(self.conv2_1(x, self.edge))
+        x2 = F.relu(self.conv2_2(x, self.edge))
+        x3 = F.relu(self.conv2_3(x, self.edge))
+        x = torch.cat((x1,x2,x3),1)
+        x = F.relu(self.conv3(x, self.edge))
+        x = F.relu(self.conv4(x, self.edge))
+        x = F.relu(self.conv5(x, self.edge))
+        
+        x = x.view(x_shape[0], -1) # set shape of x to [N,:] to keep the batch size
+        
+        adv = F.relu(self.adv(x))
+        adv = adv.view(adv.size(0),len(self.num_actions),-1)
+            
+        val = F.relu(self.val1(x))
+        val = F.relu(self.val2(val))
+        val = self.val3(val)
+        
+        return val.unsqueeze(-1).expand_as(adv) + adv - adv.mean(-1).unsqueeze(-1).expand_as(adv)
     
+    def feature_size(self):
+        x = self.conv1(torch.zeros([self.input_shape[0],self.input_shape[1]],dtype=torch.float),torch.zeros([self.edge.shape[0],self.edge.shape[1]], dtype=torch.long))
+        x1 = self.conv2_1(x,torch.zeros([self.edge.shape[0],self.edge.shape[1]], dtype=torch.long))
+        x2 = self.conv2_2(x,torch.zeros([self.edge.shape[0],self.edge.shape[1]], dtype=torch.long))
+        x3 = self.conv2_3(x,torch.zeros([self.edge.shape[0],self.edge.shape[1]], dtype=torch.long))
+        x = torch.cat((x1,x2,x3),1)
+        x = self.conv3(x,torch.zeros([self.edge.shape[0],self.edge.shape[1]], dtype=torch.long))
+        x = self.conv4(x,torch.zeros([self.edge.shape[0],self.edge.shape[1]], dtype=torch.long))
+        x = self.conv5(x,torch.zeros([self.edge.shape[0],self.edge.shape[1]], dtype=torch.long))
+        x = x.view(1, -1)
+        x = x.size(1)
+        return x
+    
+    def sample_noise(self):
+        #ignore this for now
+        pass
