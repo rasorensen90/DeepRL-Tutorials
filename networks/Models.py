@@ -68,11 +68,12 @@ class BHSDuelingDQN(nn.Module):
         pass
     
 class BHS_GCN(nn.Module):
-    def __init__(self, input_shape, num_outputs, edgelist):
+    def __init__(self, input_shape, num_outputs, edgelist, edge_weight):
         super(BHS_GCN, self).__init__()
         self.input_shape = input_shape
         self.num_actions = num_outputs # a vector of the number of actions at each diverter
-        self.edge = edgelist       
+        self.edge = edgelist
+        self.edge_weight = edge_weight
 
         self.conv1 = GCNConv(self.input_shape[1], 128)
         self.conv2 = GCNConv(128, 256)
@@ -88,8 +89,8 @@ class BHS_GCN(nn.Module):
         x_shape = x.shape 
         x = x.view(x_shape[0]*x_shape[1],x_shape[2]) # set shape of x to [N*H, C] to get the shape of a Graph batch
         
-        x = F.relu(self.conv1(x, self.edge))
-        x = F.relu(self.conv2(x, self.edge))
+        x = F.relu(self.conv1(x, self.edge, self.edge_weight))
+        x = F.relu(self.conv2(x, self.edge, self.edge_weight))
         
         x = x.view(x_shape[0], -1) # set shape of x to [N,:] to keep the batch size
         
@@ -159,11 +160,12 @@ class BHS_GAT(nn.Module):
         pass
     
 class BHS_SGN(nn.Module):
-    def __init__(self, input_shape, num_outputs, edgelist):
+    def __init__(self, input_shape, num_outputs, edgelist, edge_weight):
         super(BHS_SGN, self).__init__()
         self.input_shape = input_shape
         self.num_actions = num_outputs # a vector of the number of actions at each diverter
         self.edge = edgelist
+        self.edge_weight = edge_weight
 
         self.conv1 = SGConv(self.input_shape[1], 128,K=2)
 
@@ -178,7 +180,7 @@ class BHS_SGN(nn.Module):
         x_shape = x.shape 
         x = x.view(x_shape[0]*x_shape[1],x_shape[2]) # set shape of x to [N*H, C] to get the shape of a Graph batch
         
-        x = F.relu(self.conv1(x, self.edge))
+        x = F.relu(self.conv1(x, self.edge, self.edge_weight))
         
         x = x.view(x_shape[0], -1) # set shape of x to [N,:] to keep the batch size
         
@@ -296,11 +298,12 @@ class BHS_GIN(nn.Module):
         pass
 
 class BHS_GGNN(nn.Module):
-    def __init__(self, input_shape, num_outputs, edgelist):
+    def __init__(self, input_shape, num_outputs, edgelist, edge_weight):
         super(BHS_GGNN, self).__init__()
         self.input_shape = input_shape
         self.num_actions = num_outputs # a vector of the number of actions at each diverter
-        self.edge = edgelist       
+        self.edge = edgelist
+        self.edge_weight = edge_weight
 
         self.conv1 = GatedGraphConv(self.input_shape[1], 10)
         
@@ -315,7 +318,7 @@ class BHS_GGNN(nn.Module):
         x_shape = x.shape 
         x = x.view(x_shape[0]*x_shape[1],x_shape[2]) # set shape of x to [N*H, C] to get the shape of a Graph batch
         
-        x = F.relu(self.conv1(x, self.edge))
+        x = F.relu(self.conv1(x, self.edge, self.edge_weight))
         
         x = x.view(x_shape[0], -1) # set shape of x to [N,:] to keep the batch size
         
@@ -329,9 +332,7 @@ class BHS_GGNN(nn.Module):
         return val.unsqueeze(-1).expand_as(adv) + adv - adv.mean(-1).unsqueeze(-1).expand_as(adv)
     
     def feature_size(self):
-        x = self.conv1(
-                    torch.zeros([self.input_shape[0],self.input_shape[1]],dtype=torch.float),
-                    torch.zeros([self.edge.shape[0],self.edge.shape[1]], dtype=torch.long))
+        x = self.conv1(torch.zeros([self.input_shape[0],self.input_shape[1]],dtype=torch.float), torch.zeros([self.edge.shape[0],self.edge.shape[1]], dtype=torch.long))
         x = x.view(1, -1)
         x = x.size(1)
         return x
@@ -455,11 +456,12 @@ class BHS_TEST(nn.Module):
         pass
 
 class BHS_GCN_DQN(nn.Module):
-    def __init__(self, input_shape, num_outputs, edgelist):
+    def __init__(self, input_shape, num_outputs, edgelist, edge_weight):
         super(BHS_GCN_DQN, self).__init__()
         self.input_shape = input_shape
         self.num_actions = num_outputs # a vector of the number of actions at each diverter
-        self.edge = edgelist       
+        self.edge = edgelist
+        self.edge_weight = edge_weight
 
         self.conv1 = GCNConv(self.input_shape[1], 128)
         self.conv2_1 = GCNConv(128, 64)
@@ -481,14 +483,14 @@ class BHS_GCN_DQN(nn.Module):
         x_shape = x.shape 
         x = x.view(x_shape[0]*x_shape[1],x_shape[2]) # set shape of x to [N*H, C] to get the shape of a Graph batch
         
-        x = F.relu(self.conv1(x, self.edge))
-        x1 = F.relu(self.conv2_1(x, self.edge))
-        x2 = F.relu(self.conv2_2(x, self.edge))
-        x3 = F.relu(self.conv2_3(x, self.edge))
+        x = F.relu(self.conv1(x, self.edge, self.edge_weight))
+        x1 = F.relu(self.conv2_1(x, self.edge, self.edge_weight))
+        x2 = F.relu(self.conv2_2(x, self.edge, self.edge_weight))
+        x3 = F.relu(self.conv2_3(x, self.edge, self.edge_weight))
         x = torch.cat((x1,x2,x3),1)
-        x = F.relu(self.conv3(x, self.edge))
-        x = F.relu(self.conv4(x, self.edge))
-        x = F.relu(self.conv5(x, self.edge))
+        x = F.relu(self.conv3(x, self.edge, self.edge_weight))
+        x = F.relu(self.conv4(x, self.edge, self.edge_weight))
+        x = F.relu(self.conv5(x, self.edge, self.edge_weight))
         
         x = x.view(x_shape[0], -1) # set shape of x to [N,:] to keep the batch size
         
