@@ -102,6 +102,7 @@ def downsample_graph(src,dst,elements,graph):
     #nodes[np.arange(len(down_nodes)),down_nodes] = 1
     #down_nodes = torch.BoolTensor(sum(nodes))
     edge_attr = torch.Tensor(edge_attr)
+    edge_attr = edge_attr.view(edge_attr.shape[0],1)
     return graph_down, edgelist_down, edge_attr, edge_nodes, nodes_down
 
 def env_0_0(): #16 elements

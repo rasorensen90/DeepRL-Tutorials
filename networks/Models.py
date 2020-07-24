@@ -387,7 +387,7 @@ class BHS_NN(nn.Module):
         x = self.conv1(
                     torch.zeros([self.input_shape[0],self.input_shape[1]],dtype=torch.float),
                     torch.zeros([self.edge.shape[0],self.edge.shape[1]], dtype=torch.long),
-                    torch.zeros([self.edge.shape[1]],dtype=torch.float))
+                    torch.zeros([self.edge_attr.shape[0],self.edge_attr.shape[1]],dtype=torch.float))
         x = x.view(1, -1)
         x = x.size(1)
         return x
@@ -402,7 +402,7 @@ class BHS_CG(nn.Module):
         self.input_shape = input_shape
         self.num_actions = num_outputs # a vector of the number of actions at each diverter
         self.edge = edgelist
-        self.edge_attr = edge_attr.view(edge_attr.shape[0],1)
+        self.edge_attr = edge_attr #.view(edge_attr.shape[0],1)
         
         self.conv1 = CGConv([self.input_shape[1], self.input_shape[1]], dim=self.edge_attr.shape[1], batch_norm=True)
         
@@ -449,7 +449,7 @@ class BHS_PNA(nn.Module):
         self.input_shape = input_shape
         self.num_actions = num_outputs # a vector of the number of actions at each diverter
         self.edge = edgelist
-        self.edge_attr = edge_attr.view(edge_attr.shape[0],1)       
+        self.edge_attr = edge_attr #.view(edge_attr.shape[0],1)       
         
         d = degree(self.edge[1], num_nodes=self.input_shape[0], dtype=torch.long)
         deg = torch.bincount(d)
@@ -565,7 +565,7 @@ class BHS_TEST(nn.Module):
         self.input_shape = input_shape
         self.num_actions = num_outputs # a vector of the number of actions at each diverter
         self.edge = edgelist
-        self.edge_attr = edge_attr
+        self.edge_attr = edge_attr #.view(edge_attr.shape[0],1) 
         
         nn1 = nn.Sequential(nn.Linear(1, 64), nn.ReLU(), nn.Linear(64, self.input_shape[1]*128)) # edge attribute neural network
         self.conv1 = NNConv(self.input_shape[1], 128, nn1)
@@ -620,7 +620,7 @@ class BHS_TEST(nn.Module):
         x = self.conv1(
                     torch.zeros([self.input_shape[0],self.input_shape[1]],dtype=torch.float),
                     torch.zeros([self.edge.shape[0],self.edge.shape[1]], dtype=torch.long),
-                    torch.zeros([self.edge.shape[1],1],dtype=torch.float))
+                    torch.zeros([self.edge_attr.shape[0],self.edge_attr.shape[1]],dtype=torch.float))
         x = x.view(1,x.shape[0],x.shape[1])
         x, h = self.gate(x)
         x = x.view(1, -1)
