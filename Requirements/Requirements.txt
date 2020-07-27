@@ -47,3 +47,13 @@ Anaconda3\envs\BHS_Pytorch\Lib\site-packages\baselines\bench\monitor.py
             info['episode'] = epinfo
         self.total_steps += 1
         return (ob, rew, done, info, actual_action)
+
+
+CHANGE TORCH GEOMETRIC GAT_CONV.PY FORWARD FUNCTION LINE 122-127:
+Anaconda3\envs\BHS_Pytorch\Lib\site-packages\torch_geometric\nn\conv
+	if isinstance(x, Tensor):
+            assert x.dim() == 2, 'Static graphs not supported in `GATConv`.'
+            x_l = self.lin_l(x).view(-1, H, C)
+            alpha_l = (x_l * self.att_l).sum(dim=-1)
+            x_r = self.lin_r(x).view(-1, H, C)
+            alpha_r = (x_r * self.att_r).sum(dim=-1)
