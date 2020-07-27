@@ -18,9 +18,13 @@ pip install torch-scatter==latest+cu102 -f https://pytorch-geometric.com/whl/tor
 pip install torch-sparse==latest+cu102 -f https://pytorch-geometric.com/whl/torch-1.5.0.html
 pip install torch-cluster==latest+cu102 -f https://pytorch-geometric.com/whl/torch-1.5.0.html
 pip install torch-spline-conv==latest+cu102 -f https://pytorch-geometric.com/whl/torch-1.5.0.html
-pip install torch-geometric
+pip install torch-geometric==1.6.0
 
 conda install jupyterlab
+
+python -m site	#Se mappen for python installation
+cp -v gat_conv.py /home/frederikwestergaard/anaconda3/envs/BHS_PYTORCH/lib/python3.7/site-packages/torch_geometric/nn/conv
+cp -v monitor.py /home/frederikwestergaard/anaconda3/envs/BHS_PYTORCH/lib/python3.7/site-packages/baselines/bench
 
 CHANGE BASELINES MONITOR.PY STEP FUNCTION LINE 57-78:
 Anaconda3\envs\BHS_Pytorch\Lib\site-packages\baselines\bench\monitor.py
@@ -51,9 +55,11 @@ Anaconda3\envs\BHS_Pytorch\Lib\site-packages\baselines\bench\monitor.py
 
 CHANGE TORCH GEOMETRIC GAT_CONV.PY FORWARD FUNCTION LINE 122-127:
 Anaconda3\envs\BHS_Pytorch\Lib\site-packages\torch_geometric\nn\conv
+
 	if isinstance(x, Tensor):
             assert x.dim() == 2, 'Static graphs not supported in `GATConv`.'
             x_l = self.lin_l(x).view(-1, H, C)
             alpha_l = (x_l * self.att_l).sum(dim=-1)
             x_r = self.lin_r(x).view(-1, H, C)
             alpha_r = (x_r * self.att_r).sum(dim=-1)
+

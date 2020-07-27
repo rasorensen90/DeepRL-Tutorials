@@ -245,7 +245,7 @@ class Model(DQN_Agent):
 start=timer()
 
 if (get_ipython().__class__.__name__ == "ZMQInteractiveShell"):
-    network = "TEST"
+    network = "GAT"
     downsampled = False
 elif (len(sys.argv) > 2):
     network = sys.argv[1]
