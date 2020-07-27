@@ -5,7 +5,7 @@ import numpy as np
 
 import dgl
 from dgl.nn.pytorch.conv import SAGEConv
-from torch_geometric.nn import GCNConv, GATConv, SGConv, NNConv, GINConv, GatedGraphConv, CGConv, PNAConv
+from torch_geometric.nn import GCNConv, GATConv, SGConv, NNConv, GINConv, GatedGraphConv, CGConv, PNAConv, GINEConv
 from torch_geometric.utils import degree
 
 class BHSDuelingDQN(nn.Module):
@@ -122,8 +122,8 @@ class BHS_GAT(nn.Module):
         self.num_actions = num_outputs # a vector of the number of actions at each diverter
         self.edge = edgelist
 
-        self.conv1 = GATConv(self.input_shape[1], 64, heads=8, dropout=0.6)
-        self.conv2 = GATConv(64*8, 128, heads=8, dropout=0.6)
+        self.conv1 = GATConv(self.input_shape[1], 8, heads=8, dropout=0.6)
+        self.conv2 = GATConv(8*8, 128, heads=8, dropout=0.6)
         
         self.adv = nn.Linear(self.feature_size(), sum(self.num_actions)) # Might be an idea to add another fc layer here
 
@@ -150,8 +150,8 @@ class BHS_GAT(nn.Module):
         return val.unsqueeze(-1).expand_as(adv) + adv - adv.mean(-1).unsqueeze(-1).expand_as(adv)
     
     def feature_size(self):
-        x = self.conv1(torch.zeros([self.input_shape[0],self.input_shape[-1]],dtype=torch.float), torch.zeros([self.edge.shape[0],self.edge.shape[-1]], dtype=torch.long))
-        x = self.conv2(x,torch.zeros([self.edge.shape[0],self.edge.shape[-1]], dtype=torch.long))
+        x = self.conv1(torch.zeros([self.input_shape[0],self.input_shape[1]],dtype=torch.float), torch.zeros([self.edge.shape[0],self.edge.shape[1]], dtype=torch.long))
+        x = self.conv2(x,torch.zeros([self.edge.shape[0],self.edge.shape[1]], dtype=torch.long))
         x = x.view(1, -1)
         x = x.size(1)
         return x
@@ -402,7 +402,7 @@ class BHS_CG(nn.Module):
         self.input_shape = input_shape
         self.num_actions = num_outputs # a vector of the number of actions at each diverter
         self.edge = edgelist
-        self.edge_attr = edge_attr #.view(edge_attr.shape[0],1)
+        self.edge_attr = edge_attr
         
         self.conv1 = CGConv([self.input_shape[1], self.input_shape[1]], dim=self.edge_attr.shape[1], batch_norm=True)
         
@@ -449,7 +449,7 @@ class BHS_PNA(nn.Module):
         self.input_shape = input_shape
         self.num_actions = num_outputs # a vector of the number of actions at each diverter
         self.edge = edgelist
-        self.edge_attr = edge_attr #.view(edge_attr.shape[0],1)       
+        self.edge_attr = edge_attr      
         
         d = degree(self.edge[1], num_nodes=self.input_shape[0], dtype=torch.long)
         deg = torch.bincount(d)
@@ -565,7 +565,8 @@ class BHS_TEST(nn.Module):
         self.input_shape = input_shape
         self.num_actions = num_outputs # a vector of the number of actions at each diverter
         self.edge = edgelist
-        self.edge_attr = edge_attr #.view(edge_attr.shape[0],1) 
+        self.edge_attr = edge_attr
+        self.hidden = torch.zeros([5,self.input_shape[0],128],dtype=torch.float)
         
         nn1 = nn.Sequential(nn.Linear(1, 64), nn.ReLU(), nn.Linear(64, self.input_shape[1]*128)) # edge attribute neural network
         self.conv1 = NNConv(self.input_shape[1], 128, nn1)
@@ -602,8 +603,8 @@ class BHS_TEST(nn.Module):
         
         x = F.relu(self.conv1(x, self.edge, self.edge_attr))
         x = x.view(x_shape[0],x_shape[1],x.shape[1])
-        x, h = self.gate(x)
-
+        x, self.hidden = self.gate(x, self.hidden)
+        
         x = x.view(x_shape[0], -1) # set shape of x to [N,:] to keep the batch size
         
         
