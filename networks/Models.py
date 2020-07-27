@@ -560,17 +560,17 @@ class BHS_GCN_DQN(nn.Module):
         pass
     
 class BHS_TEST(nn.Module):
-    def __init__(self, input_shape, num_outputs, edgelist, edge_attr):
+    def __init__(self, input_shape, num_outputs, edgelist, edge_attr, hidden):
         super(BHS_TEST, self).__init__()
         self.input_shape = input_shape
         self.num_actions = num_outputs # a vector of the number of actions at each diverter
         self.edge = edgelist
         self.edge_attr = edge_attr
-        self.hidden = torch.zeros([5,self.input_shape[0],128],dtype=torch.float)
+        self.hidden = hidden
         
-        nn1 = nn.Sequential(nn.Linear(1, 64), nn.ReLU(), nn.Linear(64, self.input_shape[1]*128)) # edge attribute neural network
-        self.conv1 = NNConv(self.input_shape[1], 128, nn1)
-        self.gate = nn.GRU(128, 128, 5)
+        nn1 = nn.Sequential(nn.Linear(1, 64), nn.ReLU(), nn.Linear(64, self.input_shape[1]*self.hidden.shape[2])) # edge attribute neural network
+        self.conv1 = NNConv(self.input_shape[1], self.hidden.shape[2], nn1)
+        self.gate = nn.GRU(self.hidden.shape[2], self.hidden.shape[2], self.hidden.shape[0])
         
         self.adv = nn.Linear(self.feature_size(), sum(self.num_actions)) # Might be an idea to add another fc layer here
 
