@@ -223,13 +223,15 @@ class Model(DQN_Agent):
                 edgelist = self.env.edgelist_down.to(self.device)
                 edge_attr = self.env.edge_attr.to(self.device)
                 edge_attr = edge_attr.view(edge_attr.shape[0],1)
-                self.model = BHS_TEST([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist, edge_attr)
-                self.target_model = BHS_TEST([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist, edge_attr)
+                hidden = torch.zeros([5,len(self.env.nodes),128],dtype=torch.float).to(self.device)
+                self.model = BHS_TEST([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist, edge_attr, hidden)
+                self.target_model = BHS_TEST([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist, edge_attr, hidden)
             else: 
                 edgelist = self.env.edgelist.to(self.device)
                 edge_attr = torch.ones([edgelist.shape[1],1],dtype=torch.float).to(self.device)
-                self.model = BHS_TEST(self.env.observation_space.shape, self.env.action_space.nvec, edgelist, edge_attr)
-                self.target_model = BHS_TEST(self.env.observation_space.shape, self.env.action_space.nvec, edgelist, edge_attr)
+                hidden = torch.zeros([5,self.env.observation_space.shape[0],128],dtype=torch.float).to(self.device)
+                self.model = BHS_TEST(self.env.observation_space.shape, self.env.action_space.nvec, edgelist, edge_attr, hidden)
+                self.target_model = BHS_TEST(self.env.observation_space.shape, self.env.action_space.nvec, edgelist, edge_attr, hidden)
         
         else:
             raise ValueError("Network not chosen - Choose DQN, GCN, GAT, SGN, GGNN, SAGE, GIN, NN, CG, PNA, GCN_DQN or TEST")
