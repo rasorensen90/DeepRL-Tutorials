@@ -223,7 +223,7 @@ class Model(DQN_Agent):
                 edgelist = self.env.edgelist_down.to(self.device)
                 edge_attr = self.env.edge_attr.to(self.device)
                 edge_attr = edge_attr.view(edge_attr.shape[0],1)
-                hidden = torch.zeros([5,len(self.env.nodes),128],dtype=torch.float).to(self.device)
+                hidden = torch.zeros([1,len(self.env.nodes),128],dtype=torch.float).to(self.device)
                 self.model = BHS_TEST([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist, edge_attr, hidden)
                 self.target_model = BHS_TEST([len(self.env.nodes),self.env.observation_space.shape[1]], self.env.action_space.nvec, edgelist, edge_attr, hidden)
             else: 
@@ -265,12 +265,12 @@ else:
 time = '{date:%Y-%m-%d-%H}'.format(date=datetime.datetime.now())
 print(time)
 
-log_dir = "tmp/" + network + "/"
+log_dir = "tmp/" + network + "/" + network + "_" + time + "/"
 res_dir = "Results/" + network + "/"
 filename = res_dir + network + "_" + time
 try:
     os.makedirs(res_dir, exist_ok = True)
-    os.makedirs(log_dir)
+    os.makedirs(log_dir, exist_ok = True)
 except OSError:
     files = glob.glob(os.path.join(log_dir, '*.monitor.csv'))         + glob.glob(os.path.join(log_dir, '*td.csv'))         + glob.glob(os.path.join(log_dir, '*sig_param_mag.csv'))         + glob.glob(os.path.join(log_dir, '*action_log.csv'))
     for f in files:
