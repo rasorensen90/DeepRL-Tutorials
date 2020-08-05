@@ -28,7 +28,7 @@ config.epsilon_by_frame = lambda frame_idx: config.epsilon_final + (config.epsil
 
 #misc agent variables
 config.GAMMA=0.99
-config.LR=1e-4
+config.LR=1e-3
 config.USE_PRIORITY_REPLAY = True
 
 #memory
@@ -38,7 +38,7 @@ config.BATCH_SIZE = 32
 
 #Learning control variables
 config.LEARN_START = 100
-config.MAX_FRAMES=1000000
+config.MAX_FRAMES=10000000
 config.UPDATE_FREQ = 1
 
 #Nstep controls
