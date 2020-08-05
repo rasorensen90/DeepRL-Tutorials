@@ -42,7 +42,7 @@ config.MAX_FRAMES=1000000
 config.UPDATE_FREQ = 1
 
 #Nstep controls
-config.N_STEPS=5
+config.N_STEPS=1
 
 #data logging parameters
 config.ACTION_SELECTION_COUNT_FREQUENCY = 1000
@@ -252,7 +252,7 @@ def main(args):
     envsize= len(env.elems)
     log_dir = "Results/" + args.network + "/"
     date_time = args.load_from_model
-    model  = Model(env=env, config=config, network=args.network)
+    model  = Model(env=env, config=config, network=args.network, downsampled=args.downsampled)
     model.load_model_dict(log_dir + args.network + "_" + date_time + ".pt")
     base_directory = log_dir + "Test/"
     logdir = base_directory + date_time + "/"
@@ -490,8 +490,9 @@ if __name__ == '__main__':
     parser.add_argument('--iterations', type=int, default=100)
     parser.add_argument('--load_from_model', type=str, default="2020-07-02-15")
     parser.add_argument('--network', type=str, default="GCN")
+    parser.add_argument('--downsampled', type=str, default=False)
     parser.add_argument('--numtotes', type=int, default=1)
-    parser.add_argument('--RL_only', type=str2bool, default=True)
+    parser.add_argument('--RL_only', type=str2bool, default=False)
     parser.add_argument('--detailed_log', type=str2bool, default=True)
     parser.add_argument('--no_render', type=str2bool, default=True)
     parser.add_argument('--randomize_numtotes', type=str2bool, default=False)

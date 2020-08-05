@@ -65,7 +65,7 @@ config.MAX_FRAMES=1000000
 config.UPDATE_FREQ = 1
 
 #Nstep controls
-config.N_STEPS=5
+config.N_STEPS=1
 
 #data logging parameters
 config.ACTION_SELECTION_COUNT_FREQUENCY = 1000
@@ -286,8 +286,8 @@ class Arg_parser():
         self.step_penalty = None
         self.trasum_scale = None
         self.destination_score = None
-        self.numtotes = 30
-        self.randomize_numtotes = False
+        self.numtotes = 50
+        self.randomize_numtotes = True
         self.RL_diverters = None
         self.downsampled = downsampled
     
