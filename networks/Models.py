@@ -27,6 +27,8 @@ class BHSDuelingDQN(nn.Module):
         self.val1 = nn.Linear(self.feature_size(), 64)
         self.val2 = nn.Linear(64, 64)
         self.val3 = nn.Linear(64, 1) #len(self.num_actions)
+        #self.val3 = nn.Linear(64, len(self.num_actions))
+        
 
     def forward(self, x):        
         # x comes in as an N x H x C shape
@@ -84,6 +86,7 @@ class BHS_GCN(nn.Module):
         self.val1 = nn.Linear(self.feature_size(), 64)
         self.val2 = nn.Linear(64, 64)
         self.val3 = nn.Linear(64, 1)
+        #self.val3 = nn.Linear(64, len(self.num_actions))
 
     def forward(self, x):        
         # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))
@@ -129,7 +132,8 @@ class BHS_GAT(nn.Module):
 
         self.val1 = nn.Linear(self.feature_size(), 64)
         self.val2 = nn.Linear(64, 64)
-        self.val3 = nn.Linear(64, 1)
+        #self.val3 = nn.Linear(64, 1)
+        self.val3 = nn.Linear(64, len(self.num_actions))
 
     def forward(self, x):        
         # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))
@@ -175,6 +179,7 @@ class BHS_SGN(nn.Module):
         self.val1 = nn.Linear(self.feature_size(), 64)
         self.val2 = nn.Linear(64, 64)
         self.val3 = nn.Linear(64, 1)
+        #self.val3 = nn.Linear(64, len(self.num_actions))
 
     def forward(self, x):        
         # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))
@@ -217,6 +222,7 @@ class BHS_SAGE(nn.Module):
         self.val1 = nn.Linear(self.feature_size(), 64)
         self.val2 = nn.Linear(64, 64)
         self.val3 = nn.Linear(64, 1)
+        #self.val3 = nn.Linear(64, len(self.num_actions))
 
     def forward(self, x):        
         # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))
@@ -267,6 +273,7 @@ class BHS_GIN(nn.Module):
         self.val1 = nn.Linear(self.feature_size(), 64)
         self.val2 = nn.Linear(64, 64)
         self.val3 = nn.Linear(64, 1)
+        #self.val3 = nn.Linear(64, len(self.num_actions))
 
     def forward(self, x):        
         # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))
@@ -319,6 +326,7 @@ class BHS_GGNN(nn.Module):
         self.val1 = nn.Linear(self.feature_size(), 64)
         self.val2 = nn.Linear(64, 64)
         self.val3 = nn.Linear(64, 1)
+        #self.val3 = nn.Linear(64, len(self.num_actions))
 
     def forward(self, x):        
         # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))
@@ -364,6 +372,7 @@ class BHS_NN(nn.Module):
         self.val1 = nn.Linear(self.feature_size(), 64)
         self.val2 = nn.Linear(64, 64)
         self.val3 = nn.Linear(64, 1)
+        #self.val3 = nn.Linear(64, len(self.num_actions))
 
     def forward(self, x):        
         # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))
@@ -411,6 +420,7 @@ class BHS_CG(nn.Module):
         self.val1 = nn.Linear(self.feature_size(), 64)
         self.val2 = nn.Linear(64, 64)
         self.val3 = nn.Linear(64, 1)
+        #self.val3 = nn.Linear(64, len(self.num_actions))
 
     def forward(self, x):        
         # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))
@@ -462,6 +472,7 @@ class BHS_PNA(nn.Module):
         self.val1 = nn.Linear(self.feature_size(), 64)
         self.val2 = nn.Linear(64, 64)
         self.val3 = nn.Linear(64, 1)
+        #self.val3 = nn.Linear(64, len(self.num_actions))
 
     def forward(self, x):        
         # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))

@@ -247,7 +247,11 @@ def str2bool(v):
 def main(args):
     os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID" 
     os.environ["CUDA_VISIBLE_DEVICES"]=args.gpu
-    
+    if (args.downsampled == 'True'):
+        args.downsampled = True
+    elif (args.downsampled == 'False'):
+        args.downsampled = False
+        
     env = Environment(args)
     envsize= len(env.elems)
     log_dir = "Results/" + args.network + "/"
@@ -316,7 +320,7 @@ def main(args):
                 SSP_reward = 0
                 SSP_steps = 0
                 while not done:
-                    _, SSPRew, done, tote_info = env.step(shortestPath=True, dynamic=False,  dla=False)
+                    _, SSPRew, done, tote_info, _ = env.step(shortestPath=True, dynamic=False,  dla=False)
                     SSP_reward += SSPRew
                     SSP_steps += 1
                 print("SSP")
@@ -337,7 +341,7 @@ def main(args):
                 DSP_reward = 0
                 DSP_steps = 0
                 while not done:
-                    _, DSPRew, done, tote_info = env.step(shortestPath=True, dynamic=True,  dla=False)
+                    _, DSPRew, done, tote_info, _ = env.step(shortestPath=True, dynamic=True,  dla=False)
                     DSP_reward += DSPRew
                     DSP_steps += 1
                 print("DSP")
@@ -358,7 +362,7 @@ def main(args):
                 DSPdla_reward = 0
                 DSPdla_steps = 0
                 while not done:
-                    _, DSPdlaRew, done, tote_info = env.step(shortestPath=True, dynamic=True, dla=True)
+                    _, DSPdlaRew, done, tote_info, _ = env.step(shortestPath=True, dynamic=True, dla=True)
                     DSPdla_reward += DSPdlaRew
                     DSPdla_steps += 1
                 print("DSPdla")

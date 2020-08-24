@@ -11,6 +11,7 @@
 import gym, math, glob, sys
 import numpy as np
 import datetime
+import csv
 
 from timeit import default_timer as timer
 from datetime import timedelta
@@ -247,8 +248,8 @@ class Model(DQN_Agent):
 start=timer()
 
 if (get_ipython().__class__.__name__ == "ZMQInteractiveShell"):
-    network = "GAT"
-    downsampled = False
+    network = "NN"
+    downsampled = True
 elif (len(sys.argv) > 2):
     network = sys.argv[1]
     downsampled = sys.argv[2]
@@ -282,12 +283,12 @@ class Arg_parser():
         self.envtype = 'env_2_0'
         self.tb_log_name = 'DQN'
         self.steplimit = 200
-        self.log_interval = 1000
+        self.log_interval = 20000
         self.step_penalty = None
         self.trasum_scale = None
         self.destination_score = None
         self.numtotes = 30
-        self.randomize_numtotes = False
+        self.randomize_numtotes = True
         self.RL_diverters = None
         self.downsampled = downsampled
     
@@ -344,6 +345,10 @@ for frame_idx in range(1, config.MAX_FRAMES + 1):
             clear_output(True)
             print(frame_idx)
             print(time_get/args.log_interval, time_step/args.log_interval, time_update/args.log_interval)
+            with open(filename+'.csv', mode='a',newline='') as time_file:
+                time_writer = csv.writer(time_file, delimiter=',')
+                time_writer.writerow([time_get/args.log_interval, time_step/args.log_interval, time_update/args.log_interval])
+                
             time_get, time_step, time_update = 0,0,0
             plot_all_data(log_dir, env_id, 'BHSDuelingDQN', config.MAX_FRAMES, bin_size=(10, 100, 100, 1), smooth=1, time=timedelta(seconds=int(timer()-start)), save_filename=filename+".svg", ipynb=False)
         except IOError:
