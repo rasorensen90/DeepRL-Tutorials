@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import csv
+import os
 #markerstyle= (cycler('linestyle', ['-', '--', ':', '=.']) * cycler('marker', ['^',',', '.']))
 #
 #plt.rcParams['axes.grid'] = True
@@ -28,6 +29,7 @@ plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 plt.rc('figure',figsize=figuresize)
 
 network = 'DQN'
+os.makedirs('Figures/' + network + '/', exist_ok = True)
 
 if (network == 'DQN'):
     times_F = ['2020-08-12-16', '2020-07-31-20', '2020-08-02-22', '2020-08-12-00', '2020-08-13-13']
@@ -66,7 +68,7 @@ env2_80F = 'Results/'+ network + '/Test/' + times_F[2] + '/NumToteTest_' + times
 env2_R1F = 'Results/'+ network + '/Test/' + times_F[3] + '/NumToteTest_' + times_F[3] + '.csv'
 
 fig = plt.figure()
-plt.suptitle('Reward of RL ' + network + ' models',y=1.02)
+plt.suptitle('Reward of RL ' + network + ' models',y=1.0)
 # ENV 2 - Reward
 x = []
 RL30 = []
@@ -75,54 +77,57 @@ RL80 = []
 RLR = []
 SSP = []
 DSP = [] 
+DSPdla = [] 
 # SSP, DSP, RL30%
 with open(env2_30F,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL30.append(float(row[8]))
-        SSP.append(float(row[9]))
-        DSP.append(float(row[10]))
+        RL30.append(float(row[10]))
+        SSP.append(float(row[11]))
+        DSP.append(float(row[12]))
+        DSPdla.append(float(row[13]))
         x.append(int(100*float(row[1])))
 
 # RL50%
 with open(env2_50F,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL50.append(float(row[8]))
+        RL50.append(float(row[10]))
 
 # RL80%
 with open(env2_80F,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL80.append(float(row[8]))
+        RL80.append(float(row[10]))
         
 # RLR%
 with open(env2_R1F,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RLR.append(float(row[8]))
+        RLR.append(float(row[10]))
         
 #env2 = fig.add_subplot(3,1,1)
-markevery_=1
-plt.plot(x, RL30,',--', fillstyle='none', label='RL30',markevery=markevery_,lw=lw,ms=ms,mew=lw)
-plt.plot(x, RL50,'.--', fillstyle='none', label='RL50',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+markevery_=4
+plt.plot(x, RL30,'>-', fillstyle='none', label='RL30',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.plot(x, RL50,'<-', fillstyle='none', label='RL50',markevery=markevery_,lw=lw,ms=ms,mew=lw)
 plt.plot(x, RL80,'^-', fillstyle='none', label='RL80',markevery=markevery_,lw=lw,ms=ms,mew=lw)
-plt.plot(x, RLR, 'k.-', fillstyle='none', label='RLR',markevery=markevery_,lw=lw,ms=ms,mew=lw)
-plt.plot(x, SSP, '^-', fillstyle='none', label='SSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
-plt.plot(x, DSP, '*-', fillstyle='none', label='DSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
-plt.xlabel('Load')
+plt.plot(x, RLR, '*-', fillstyle='none', label='RLR',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.plot(x, SSP, '+--', fillstyle='none', label='SSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.plot(x, DSP, '.--', fillstyle='none', label='DSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.plot(x, DSPdla, 'x--', fillstyle='none', label='DSPdla',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.xlabel('Load %')
 plt.ylabel('Average reward')
 #env1.title.set_text('Environment 1')#,y=1.25)
-fig.text(0.5,-0.25, "Environment 2", ha="center", transform=fig.transAxes)
-plt.legend(loc='upper center',bbox_to_anchor=(0.5, 1.6), ncol=3)
+fig.text(0.5,0.05, "Environment 2", ha="center")
+plt.legend(loc='upper center',bbox_to_anchor=(0.5, 1.1), ncol=4)
 
 plt.grid()
 #plt.show()
 #env1.savefig('env1-reward.eps', format='eps', dpi=1200,bbox_inches='tight')
-fig.savefig('Figures/RL_reward_' + network + '_F.eps', format='eps', dpi=1200,bbox_inches='tight')
+fig.savefig('Figures/' + network + '/RL_reward_' + network + '_F.eps', format='eps', dpi=1200,bbox_inches='tight')
 
 fig = plt.figure()
-plt.suptitle('Deathlock of RL ' + network + ' models',y=1.02)
+plt.suptitle('Deathlock of RL ' + network + ' models',y=1.0)
 # ENV 2 - Deadlocks
 x = []
 RL30 = []
@@ -131,46 +136,50 @@ RL80 = []
 RLR = []
 SSP = []
 DSP = []
+DSPdla = []
 # SSP, DSP, RL30%
 with open(env2_30F,'r') as csvfile:
-    plots = csv.reader(csvfile, delimiter=',',markevery=5)
+    plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL30.append(float(row[14]))
-        SSP.append(float(row[15]))
-        DSP.append(float(row[16]))
+        RL30.append(float(row[18]))
+        SSP.append(float(row[19]))
+        DSP.append(float(row[20]))
+        DSPdla.append(float(row[21]))
         x.append(int(100*float(row[1])))
 
 # RL50%
 with open(env2_50F,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL50.append(float(row[14]))
+        RL50.append(float(row[18]))
 
 # RL80%
 with open(env2_80F,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL80.append(float(row[14]))
+        RL80.append(float(row[18]))
         
 # RLR%
 with open(env2_R1F,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RLR.append(float(row[14]))
+        RLR.append(float(row[18]))
         
-plt.plot(x, RL30,',-', label='RL30')
-plt.plot(x, RL50,'.-', label='RL50')
-plt.plot(x, RL80,',--', label='RL80')
-plt.plot(x, RLR, '.--', label='RLR')
-plt.plot(x, SSP, '^:', label='SSP')
-plt.plot(x, DSP, ',:', label='DSP')
-plt.xlabel('Load')
+markevery_=4
+plt.semilogy(x, RL30,'>-', fillstyle='none', label='RL30',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, RL50,'<-', fillstyle='none', label='RL50',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, RL80,'^-', fillstyle='none', label='RL80',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, RLR, '*-', fillstyle='none', label='RLR',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, SSP, '+--', fillstyle='none', label='SSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, DSP, '.--', fillstyle='none', label='DSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, DSPdla, 'x--', fillstyle='none', label='DSPdla',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.xlabel('Load %')
 plt.ylabel('Deadlocks in 100 iterations')
-fig.text(0.5,-0.25, "Environment 2", ha="center", transform=fig.transAxes)
-plt.legend(loc='upper center',bbox_to_anchor=(0.5, 1.6), ncol=3)
+fig.text(0.5,0.05, "Environment 2", ha="center")
+plt.legend(loc='upper center',bbox_to_anchor=(0.5, 1.1), ncol=4)
 plt.grid()
 #plt.show()
-fig.savefig('Figures/RL_deathlock_' + network + '_F.eps', format='eps', dpi=1200)
+fig.savefig('Figures/' + network + '/RL_deathlock_' + network + '_F.eps', format='eps', dpi=1200)
 
 env2_30T = 'Results/'+ network + '/Test/' + times_T[0] + '/NumToteTest_' + times_T[0] + '.csv'
 env2_50T = 'Results/'+ network + '/Test/' + times_T[1] + '/NumToteTest_' + times_T[1] + '.csv'
@@ -178,7 +187,7 @@ env2_80T = 'Results/'+ network + '/Test/' + times_T[2] + '/NumToteTest_' + times
 env2_R1T = 'Results/'+ network + '/Test/' + times_T[3] + '/NumToteTest_' + times_T[3] + '.csv'
 
 fig = plt.figure()
-plt.suptitle('Reward of RL ' + network + ' models - Downsampled',y=1.02)
+plt.suptitle('Reward of RL ' + network + ' models - Downsampled',y=1.0)
 # ENV 2 - Reward
 x = []
 RL30 = []
@@ -186,55 +195,58 @@ RL50 = []
 RL80 = []
 RLR = []
 SSP = []
-DSP = [] 
+DSP = []
+DSPdla = [] 
 # SSP, DSP, RL30%
 with open(env2_30T,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL30.append(float(row[8]))
-        SSP.append(float(row[9]))
-        DSP.append(float(row[10]))
+        RL30.append(float(row[10]))
+        SSP.append(float(row[11]))
+        DSP.append(float(row[12]))
+        DSPdla.append(float(row[13]))
         x.append(int(100*float(row[1])))
 
 # RL50%
 with open(env2_50T,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL50.append(float(row[8]))
+        RL50.append(float(row[10]))
 
 # RL80%
 with open(env2_80T,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL80.append(float(row[8]))
+        RL80.append(float(row[10]))
         
 # RLR%
 with open(env2_R1T,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RLR.append(float(row[8]))
+        RLR.append(float(row[10]))
         
 #env2 = fig.add_subplot(3,1,1)
-markevery_=1
-plt.plot(x, RL30,',--', fillstyle='none', label='RL30',markevery=markevery_,lw=lw,ms=ms,mew=lw)
-plt.plot(x, RL50,'.--', fillstyle='none', label='RL50',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+markevery_=4
+plt.plot(x, RL30,'>-', fillstyle='none', label='RL30',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.plot(x, RL50,'<-', fillstyle='none', label='RL50',markevery=markevery_,lw=lw,ms=ms,mew=lw)
 plt.plot(x, RL80,'^-', fillstyle='none', label='RL80',markevery=markevery_,lw=lw,ms=ms,mew=lw)
-plt.plot(x, RLR, 'k.-', fillstyle='none', label='RLR',markevery=markevery_,lw=lw,ms=ms,mew=lw)
-plt.plot(x, SSP, '^-', fillstyle='none', label='SSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
-plt.plot(x, DSP, '*-', fillstyle='none', label='DSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
-plt.xlabel('Load')
+plt.plot(x, RLR, '*-', fillstyle='none', label='RLR',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.plot(x, SSP, '+--', fillstyle='none', label='SSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.plot(x, DSP, '.--', fillstyle='none', label='DSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.plot(x, DSPdla, 'x--', fillstyle='none', label='DSPdla',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.xlabel('Load %')
 plt.ylabel('Average reward')
 #env1.title.set_text('Environment 1')#,y=1.25)
-fig.text(0.5,-0.25, "Environment 2", ha="center", transform=fig.transAxes)
-plt.legend(loc='upper center',bbox_to_anchor=(0.5, 1.6), ncol=3)
+fig.text(0.5,0.05, "Environment 2", ha="center")
+plt.legend(loc='upper center',bbox_to_anchor=(0.5, 1.1), ncol=4)
 
 plt.grid()
 #plt.show()
 #env1.savefig('env1-reward.eps', format='eps', dpi=1200,bbox_inches='tight')
-fig.savefig('Figures/RL_reward_' + network + '_T.eps', format='eps', dpi=1200,bbox_inches='tight')
+fig.savefig('Figures/' + network + '/RL_reward_' + network + '_T.eps', format='eps', dpi=1200,bbox_inches='tight')
 
 fig = plt.figure()
-plt.suptitle('Deathlock of RL ' + network + ' models - Downsampled',y=1.02)
+plt.suptitle('Deathlock of RL ' + network + ' models - Downsampled',y=1.0)
 # ENV 2 - Deadlocks
 x = []
 RL30 = []
@@ -243,120 +255,132 @@ RL80 = []
 RLR = []
 SSP = []
 DSP = []
+DSPdla = []
 # SSP, DSP, RL30%
 with open(env2_30T,'r') as csvfile:
-    plots = csv.reader(csvfile, delimiter=',',markevery=5)
+    plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL30.append(float(row[14]))
-        SSP.append(float(row[15]))
-        DSP.append(float(row[16]))
+        RL30.append(float(row[18]))
+        SSP.append(float(row[19]))
+        DSP.append(float(row[20]))
+        DSPdla.append(float(row[21]))
         x.append(int(100*float(row[1])))
 
 # RL50%
 with open(env2_50T,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL50.append(float(row[14]))
+        RL50.append(float(row[18]))
 
 # RL80%
 with open(env2_80T,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL80.append(float(row[14]))
+        RL80.append(float(row[18]))
         
 # RLR%
 with open(env2_R1T,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RLR.append(float(row[14]))
+        RLR.append(float(row[18]))
         
-plt.plot(x, RL30,',-', label='RL30')
-plt.plot(x, RL50,'.-', label='RL50')
-plt.plot(x, RL80,',--', label='RL80')
-plt.plot(x, RLR, '.--', label='RLR')
-plt.plot(x, SSP, '^:', label='SSP')
-plt.plot(x, DSP, ',:', label='DSP')
-plt.xlabel('Load')
+markevery_=4
+plt.semilogy(x, RL30,'>-', fillstyle='none', label='RL30',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, RL50,'<-', fillstyle='none', label='RL50',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, RL80,'^-', fillstyle='none', label='RL80',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, RLR, '*-', fillstyle='none', label='RLR',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, SSP, '+--', fillstyle='none', label='SSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, DSP, '.--', fillstyle='none', label='DSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, DSPdla, 'x--', fillstyle='none', label='DSPdla',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.xlabel('Load %')
 plt.ylabel('Deadlocks in 100 iterations')
-fig.text(0.5,-0.25, "Environment 2", ha="center", transform=fig.transAxes)
-plt.legend(loc='upper center',bbox_to_anchor=(0.5, 1.6), ncol=3)
+fig.text(0.5,0.05, "Environment 2", ha="center")
+plt.legend(loc='upper center',bbox_to_anchor=(0.5, 1.1), ncol=4)
 plt.grid()
 #plt.show()
-fig.savefig('Figures/RL_deathlock_' + network + '_T.eps', format='eps', dpi=1200)
+fig.savefig('Figures/' + network + '/RL_deathlock_' + network + '_T.eps', format='eps', dpi=1200)
 
 env2_R10F = 'Results/'+ network + '/Test/' + times_F[4] + '/NumToteTest_' + times_F[4] + '.csv'
 env2_R10T = 'Results/'+ network + '/Test/' + times_T[4] + '/NumToteTest_' + times_T[4] + '.csv'
 
 fig = plt.figure()
-plt.suptitle('Reward of RL ' + network + ' models - Long Training',y=1.02)
+plt.suptitle('Reward of RL ' + network + ' models - Long Training',y=1.0)
 # ENV 2 - Reward
 x = []
 RL10F = []
 RL10T = []
 SSP = []
-DSP = [] 
+DSP = []
+DSPdla = []
 # SSP, DSP, RL10F%
 with open(env2_R10F,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL10F.append(float(row[8]))
-        SSP.append(float(row[9]))
-        DSP.append(float(row[10]))
+        RL10F.append(float(row[10]))
+        SSP.append(float(row[11]))
+        DSP.append(float(row[12]))
+        DSPdla.append(float(row[13]))
         x.append(int(100*float(row[1])))
 
 # RL10T%
 with open(env2_R10T,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL10T.append(float(row[8]))
+        RL10T.append(float(row[10]))
         
 #env2 = fig.add_subplot(3,1,1)
-markevery_=1
-plt.plot(x, RL10F,',--', fillstyle='none', label='RLF',markevery=markevery_,lw=lw,ms=ms,mew=lw)
-plt.plot(x, RL10T,'.--', fillstyle='none', label='RLT',markevery=markevery_,lw=lw,ms=ms,mew=lw)
-plt.plot(x, SSP, '^-', fillstyle='none', label='SSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
-plt.plot(x, DSP, '*-', fillstyle='none', label='DSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
-plt.xlabel('Load')
+markevery_=4
+plt.plot(x, RL10F,'<-', fillstyle='none', label='RLF',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.plot(x, RL10T,'>-', fillstyle='none', label='RLT',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.plot(x, SSP, '+--', fillstyle='none', label='SSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.plot(x, DSP, '.--', fillstyle='none', label='DSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.plot(x, DSPdla, 'x--', fillstyle='none', label='DSPdla',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.xlabel('Load %')
 plt.ylabel('Average reward')
 #env1.title.set_text('Environment 1')#,y=1.25)
-fig.text(0.5,-0.25, "Environment 2", ha="center", transform=fig.transAxes)
-plt.legend(loc='upper center',bbox_to_anchor=(0.5, 1.6), ncol=3)
+fig.text(0.5,0.05, "Environment 2", ha="center")
+plt.legend(loc='upper center',bbox_to_anchor=(0.5, 1.1), ncol=3)
 
 plt.grid()
 #plt.show()
 #env1.savefig('env1-reward.eps', format='eps', dpi=1200,bbox_inches='tight')
-fig.savefig('Figures/RL_reward_' + network + '_Long.eps', format='eps', dpi=1200,bbox_inches='tight')
+fig.savefig('Figures/' + network + '/RL_reward_' + network + '_Long.eps', format='eps', dpi=1200,bbox_inches='tight')
 
 fig = plt.figure()
-plt.suptitle('Deathlock of RL ' + network + ' models - Long Training',y=1.02)
+plt.suptitle('Deathlock of RL ' + network + ' models - Long Training',y=1.0)
 # ENV 2 - Deadlocks
 x = []
 RL10F = []
 RL10T = []
 SSP = []
 DSP = []
+DSPdla = []
 # SSP, DSP, RL10F%
 with open(env2_R10F,'r') as csvfile:
-    plots = csv.reader(csvfile, delimiter=',',markevery=5)
+    plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL10F.append(float(row[14]))
-        SSP.append(float(row[15]))
-        DSP.append(float(row[16]))
+        RL10F.append(float(row[18]))
+        SSP.append(float(row[19]))
+        DSP.append(float(row[20]))
+        DSPdla.append(float(row[21]))
         x.append(int(100*float(row[1])))
 
 # RLR%
 with open(env2_R10T,'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        RL10T.append(float(row[14]))
+        RL10T.append(float(row[18]))
       
-plt.plot(x, RL10F,',--', label='RLF')
-plt.plot(x, RL10T, '.--', label='RLT')
-plt.plot(x, SSP, '^:', label='SSP')
-plt.plot(x, DSP, ',:', label='DSP')
-plt.xlabel('Load')
-fig.text(0.5,-0.25, "Environment 2", ha="center", transform=fig.transAxes)
-plt.legend(loc='upper center',bbox_to_anchor=(0.5, 1.6), ncol=3)
+markevery_=4
+plt.semilogy(x, RL10F,'<-', fillstyle='none', label='RLF',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, RL10T,'>-', fillstyle='none', label='RLT',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, SSP, '+--', fillstyle='none', label='SSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, DSP, '.--', fillstyle='none', label='DSP',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.semilogy(x, DSPdla, 'x--', fillstyle='none', label='DSPdla',markevery=markevery_,lw=lw,ms=ms,mew=lw)
+plt.xlabel('Load %')
+plt.ylabel('Deadlocks in 100 iterations')
+fig.text(0.5,0.05, "Environment 2", ha="center")
+plt.legend(loc='upper center',bbox_to_anchor=(0.5, 1.1), ncol=3)
 plt.grid()
 #plt.show()
-fig.savefig('Figures/RL_deathlock_' + network + '_Long.eps', format='eps', dpi=1200)
+fig.savefig('Figures/' + network + '/RL_deathlock_' + network + '_Long.eps', format='eps', dpi=1200)

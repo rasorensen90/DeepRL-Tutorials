@@ -12,4 +12,4 @@ __pycache__/
 .mypy_cache/
 
 #Data
-#tmp/
+tmp/

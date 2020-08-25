@@ -5,7 +5,7 @@ import numpy as np
 
 import dgl
 from dgl.nn.pytorch.conv import SAGEConv
-from torch_geometric.nn import GCNConv, GATConv, SGConv, NNConv, GINConv, GatedGraphConv, CGConv, PNAConv, GINEConv
+from torch_geometric.nn import GCNConv, GATConv, SGConv, NNConv, GINConv, GatedGraphConv, CGConv, PNAConv
 from torch_geometric.utils import degree
 
 class BHSDuelingDQN(nn.Module):
@@ -132,8 +132,8 @@ class BHS_GAT(nn.Module):
 
         self.val1 = nn.Linear(self.feature_size(), 64)
         self.val2 = nn.Linear(64, 64)
-        #self.val3 = nn.Linear(64, 1)
-        self.val3 = nn.Linear(64, len(self.num_actions))
+        self.val3 = nn.Linear(64, 1)
+        #self.val3 = nn.Linear(64, len(self.num_actions))
 
     def forward(self, x):        
         # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))
@@ -325,8 +325,8 @@ class BHS_GGNN(nn.Module):
 
         self.val1 = nn.Linear(self.feature_size(), 64)
         self.val2 = nn.Linear(64, 64)
-        self.val3 = nn.Linear(64, 1)
-        #self.val3 = nn.Linear(64, len(self.num_actions))
+        #self.val3 = nn.Linear(64, 1)
+        self.val3 = nn.Linear(64, len(self.num_actions))
 
     def forward(self, x):        
         # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))

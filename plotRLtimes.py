@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import csv
 import statistics as stat
 import numpy as np
+import os
 
 plt.rcParams['axes.spines.top'] = False
 plt.rcParams['axes.spines.right'] = False
@@ -28,6 +29,7 @@ plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 plt.rc('figure',figsize=figuresize)
 
 network = 'DQN'
+os.makedirs('Figures/' + network + '/', exist_ok = True)
 
 if (network == 'DQN'):
     times = ['2020-08-13-13', '2020-08-16-21']
@@ -91,9 +93,9 @@ UP_mean = [stat.mean(RLF_UP), stat.mean(RLT_UP)]
 print('UP False', UP_mean[0], '+-', UP_std[0])
 print('UP True', UP_mean[1], '+-', UP_std[1])
 
-plt.bar([0, 1], GET_mean, width, yerr=GET_std, label='Get action')
-plt.bar([0, 1], STEP_mean, width, yerr=STEP_std, bottom=GET_mean, label='Environment step')
-plt.bar([0, 1], UP_mean, width, yerr=UP_std, bottom=np.add(GET_mean, STEP_mean).tolist(), label='Update network')
+plt.bar([0, 1], GET_mean, width, label='Get action')
+plt.bar([0, 1], STEP_mean, width, bottom=GET_mean, label='Environment step')
+plt.bar([0, 1], UP_mean, width, bottom=np.add(GET_mean, STEP_mean).tolist(), label='Update network')
 plt.xticks([0, 1], ('Full graph', 'Downsampled graph'))
 plt.ylabel('Time [s]')
 #env1.title.set_text('Environment 1')#,y=1.25)
@@ -102,4 +104,4 @@ plt.legend(loc='upper center',bbox_to_anchor=(0.5, 1.1), ncol=3)
 
 plt.grid()
 #plt.show()
-fig.savefig('Figures/RL_times_' + network + '.eps', format='eps', dpi=1200,bbox_inches='tight')
+fig.savefig('Figures/' + network + '/RL_times_' + network + '.eps', format='eps', dpi=1200,bbox_inches='tight')
