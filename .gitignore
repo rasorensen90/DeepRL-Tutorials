@@ -13,3 +13,4 @@ __pycache__/
 
 #Data
 tmp/
+detailed_log/

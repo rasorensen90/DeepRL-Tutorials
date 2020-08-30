@@ -26,7 +26,7 @@ class BHSDuelingDQN(nn.Module):
 
         self.val1 = nn.Linear(self.feature_size(), 64)
         self.val2 = nn.Linear(64, 64)
-        self.val3 = nn.Linear(64, 1) #len(self.num_actions)
+        self.val3 = nn.Linear(64, 1)
         #self.val3 = nn.Linear(64, len(self.num_actions))
         
 
@@ -215,7 +215,7 @@ class BHS_SAGE(nn.Module):
         self.num_actions = num_outputs # a vector of the number of actions at each diverter
         self.graph = graph       
 
-        self.conv1 = SAGEConv(self.input_shape[1], 128,"lstm") #Aggregator type: "mean"/"gcn"/"pool"/"lstm"
+        self.conv1 = SAGEConv(self.input_shape[1], 128,"pool") #Aggregator type: "mean"/"gcn"/"pool"/"lstm"
         
         self.adv = nn.Linear(self.feature_size(), sum(self.num_actions)) # Might be an idea to add another fc layer here
 
@@ -325,8 +325,8 @@ class BHS_GGNN(nn.Module):
 
         self.val1 = nn.Linear(self.feature_size(), 64)
         self.val2 = nn.Linear(64, 64)
-        #self.val3 = nn.Linear(64, 1)
-        self.val3 = nn.Linear(64, len(self.num_actions))
+        self.val3 = nn.Linear(64, 1)
+        #self.val3 = nn.Linear(64, len(self.num_actions))
 
     def forward(self, x):        
         # x comes in as an N x H x C shape (N is batch size, H is number of elements (height), C is number of features (channels))

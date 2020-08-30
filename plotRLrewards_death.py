@@ -28,12 +28,12 @@ plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 plt.rc('figure',figsize=figuresize)
 
-network = 'DQN'
+network = 'PNA'
 os.makedirs('Figures/' + network + '/', exist_ok = True)
 
 if (network == 'DQN'):
     times_F = ['2020-08-12-16', '2020-07-31-20', '2020-08-02-22', '2020-08-12-00', '2020-08-13-13']
-    times_T = ['2020-07-29-09', '2020-07-31-09', '2020-08-02-16', '2020-08-12-10', '2020-08-16-21']
+    times_T = ['2020-07-12-01', '2020-07-31-09', '2020-08-02-16', '2020-08-12-10', '2020-08-16-21']
 elif (network == 'GAT'):
     times_F = ['2020-08-12-16', '2020-07-31-20', '2020-08-03-09', '2020-08-04-22', '2020-08-13-13']
     times_T = ['2020-07-29-09', '2020-07-31-11', '2020-08-02-16', '2020-08-04-16', '2020-08-18-17']
@@ -41,23 +41,23 @@ elif (network == 'GGNN'):
     times_F = ['2020-07-29-22', '2020-07-30-08', '2020-08-01-13', '2020-08-12-00', '2020-08-13-13']
     times_T = ['2020-07-29-16', '2020-07-30-17', '2020-08-02-09', '2020-08-05-08', '2020-08-16-21']
 elif (network == 'NN'):
-    times_F = ['2020-07-29-22', '2020-07-30-08', '2020-08-01-13', '2020-08-12-10', '2020-08-13-13']
-    times_T = ['2020-07-29-16', '2020-07-30-17', '2020-08-02-09', '2020-08-05-08', '2020-08-16-21']
+    times_F = ['2020-07-05-08', '2020-07-30-08', '2020-08-01-13', '2020-08-12-10', '2020-08-13-13']
+    times_T = ['2020-07-25-14', '2020-07-30-17', '2020-08-02-09', '2020-08-05-08', '2020-08-16-21']
 elif (network == 'SAGE'):
     times_F = ['2020-07-30-08', '2020-08-12-15', '2020-08-01-13', '2020-08-04-16', '2020-08-13-13']
-    times_T = ['2020-07-29-16', '2020-08-03-09', '2020-08-02-09', '2020-08-05-08', '2020-08-19-22']
+    times_T = ['2020-07-17-09', '2020-08-03-09', '2020-08-02-09', '2020-08-05-08', '2020-08-19-22']
 elif (network == 'GCN'):
     times_F = ['2020-08-12-16', '2020-07-31-20', '2020-08-03-09', '2020-08-04-22', '2020-08-18-17']
     times_T = ['2020-07-29-09', '2020-07-31-11', '2020-08-02-16', '2020-08-04-16', '2020-08-22-10']
 elif (network == 'CG'):
-    times_F = ['2020-08-13-00', '2020-07-31-20', '2020-08-02-22', '2020-08-12-00', '2020-08-18-17']
+    times_F = ['2020-07-28-18', '2020-07-31-20', '2020-08-02-22', '2020-08-12-00', '2020-08-18-17']
     times_T = ['2020-07-29-09', '2020-07-31-09', '2020-08-02-16', '2020-08-12-10', '2020-08-21-09']
 elif (network == 'SGN'):
     times_F = ['2020-08-13-00', '2020-07-31-20', '2020-08-02-22', '2020-08-12-00', '2020-08-19-11']
     times_T = ['2020-07-29-09', '2020-07-31-09', '2020-08-02-16', '2020-08-12-10', '2020-08-22-12']
 elif (network == 'GIN'):
     times_F = ['2020-07-29-22', '2020-07-30-08', '2020-08-01-13', '2020-08-12-00', '2020-08-22-20']
-    times_T = ['2020-07-29-16', '2020-07-30-17', '2020-08-02-09', '2020-08-05-09', '']
+    times_T = ['2020-07-29-16', '2020-07-30-17', '2020-08-02-09', '2020-08-05-09', '2020-08-27-12']
 elif (network == 'PNA'):
     times_F = ['2020-07-29-22', '2020-07-30-08', '2020-08-01-13', '2020-08-12-10', '2020-08-21-15']
     times_T = ['2020-07-29-16', '2020-07-30-17', '2020-08-02-09', '2020-08-05-08', '2020-08-24-16']
@@ -68,7 +68,7 @@ env2_80F = 'Results/'+ network + '/Test/' + times_F[2] + '/NumToteTest_' + times
 env2_R1F = 'Results/'+ network + '/Test/' + times_F[3] + '/NumToteTest_' + times_F[3] + '.csv'
 
 fig = plt.figure()
-plt.suptitle('Reward of RL ' + network + ' models',y=1.0)
+plt.suptitle('Rewards of ' + network + ' models',y=1.0)
 # ENV 2 - Reward
 x = []
 RL30 = []
@@ -127,7 +127,7 @@ plt.grid()
 fig.savefig('Figures/' + network + '/RL_reward_' + network + '_F.eps', format='eps', dpi=1200,bbox_inches='tight')
 
 fig = plt.figure()
-plt.suptitle('Deathlock of RL ' + network + ' models',y=1.0)
+plt.suptitle('Deadlocks of ' + network + ' models',y=1.0)
 # ENV 2 - Deadlocks
 x = []
 RL30 = []
@@ -187,7 +187,7 @@ env2_80T = 'Results/'+ network + '/Test/' + times_T[2] + '/NumToteTest_' + times
 env2_R1T = 'Results/'+ network + '/Test/' + times_T[3] + '/NumToteTest_' + times_T[3] + '.csv'
 
 fig = plt.figure()
-plt.suptitle('Reward of RL ' + network + ' models - Downsampled',y=1.0)
+plt.suptitle('Rewards of ' + network + ' models - Downsampled',y=1.0)
 # ENV 2 - Reward
 x = []
 RL30 = []
@@ -246,7 +246,7 @@ plt.grid()
 fig.savefig('Figures/' + network + '/RL_reward_' + network + '_T.eps', format='eps', dpi=1200,bbox_inches='tight')
 
 fig = plt.figure()
-plt.suptitle('Deathlock of RL ' + network + ' models - Downsampled',y=1.0)
+plt.suptitle('Deadlocks of ' + network + ' models - Downsampled',y=1.0)
 # ENV 2 - Deadlocks
 x = []
 RL30 = []
@@ -304,7 +304,7 @@ env2_R10F = 'Results/'+ network + '/Test/' + times_F[4] + '/NumToteTest_' + time
 env2_R10T = 'Results/'+ network + '/Test/' + times_T[4] + '/NumToteTest_' + times_T[4] + '.csv'
 
 fig = plt.figure()
-plt.suptitle('Reward of RL ' + network + ' models - Long Training',y=1.0)
+plt.suptitle('Rewards of ' + network + ' models - Long Training',y=1.0)
 # ENV 2 - Reward
 x = []
 RL10F = []
@@ -347,7 +347,7 @@ plt.grid()
 fig.savefig('Figures/' + network + '/RL_reward_' + network + '_Long.eps', format='eps', dpi=1200,bbox_inches='tight')
 
 fig = plt.figure()
-plt.suptitle('Deathlock of RL ' + network + ' models - Long Training',y=1.0)
+plt.suptitle('Deadlocks of ' + network + ' models - Long Training',y=1.0)
 # ENV 2 - Deadlocks
 x = []
 RL10F = []

@@ -28,35 +28,35 @@ plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 plt.rc('figure',figsize=figuresize)
 
-network = 'DQN'
+network = 'PNA'
 os.makedirs('Figures/' + network + '/', exist_ok = True)
 
 if (network == 'DQN'):
-    times = ['2020-08-13-13', '2020-08-16-21']
+    times = ['2020-08-29-12', '2020-08-29-19']
 elif (network == 'GAT'):
-    times = ['', '']
+    times = ['2020-08-29-13', '2020-08-29-19']
 elif (network == 'GGNN'):
-    times = ['', '']
+    times = ['2020-08-29-15', '2020-08-29-21']
 elif (network == 'NN'):
-    times = ['', '']
+    times = ['2020-08-29-17', '2020-08-29-21']
 elif (network == 'SAGE'):
-    times = ['', '']
+    times = ['2020-08-29-18', '2020-08-29-22']
 elif (network == 'GCN'):
-    times = ['', '']
+    times = ['2020-08-29-13', '2020-08-29-20']
 elif (network == 'CG'):
-    times = ['', '']
+    times = ['2020-08-29-14', '2020-08-29-20']
 elif (network == 'SGN'):
-    times = ['', '']
+    times = ['2020-08-29-14', '2020-08-29-20']
 elif (network == 'GIN'):
-    times = ['', '']
+    times = ['2020-08-29-15', '2020-08-29-21']
 elif (network == 'PNA'):
-    times = ['', '']
+    times = ['2020-08-29-18', '2020-08-29-22']
 
 env2_RF = 'Results/' + network + '/' + network + '_' + times[0] + '.csv'
 env2_RT = 'Results/' + network + '/' + network + '_' + times[1] + '.csv'
 
 fig = plt.figure()
-plt.suptitle('Times of RL ' + network + ' models',y=1.0)
+plt.suptitle('Time comparison of ' + network,y=1.0)
 # ENV 2 - Reward
 RLF_GET = []
 RLF_STEP = []
@@ -80,24 +80,29 @@ with open(env2_RT,'r') as csvfile:
         RLT_STEP.append(float(row[1]))
         RLT_UP.append(float(row[2]))
 
-GET_std = [stat.pstdev(RLF_GET), stat.pstdev(RLT_GET)]
-GET_mean = [stat.mean(RLF_GET), stat.mean(RLT_GET)]
-print('GET False', GET_mean[0], '+-', GET_std[0])
-print('GET True', GET_mean[1], '+-', GET_std[1])
-STEP_std = [stat.pstdev(RLF_STEP), stat.pstdev(RLT_STEP)]
-STEP_mean = [stat.mean(RLF_STEP), stat.mean(RLT_STEP)]
-print('STEP False', STEP_mean[0], '+-', STEP_std[0])
-print('STEP True', STEP_mean[1], '+-', STEP_std[1])
-UP_std = [stat.pstdev(RLF_UP), stat.pstdev(RLT_UP)]
-UP_mean = [stat.mean(RLF_UP), stat.mean(RLT_UP)]
-print('UP False', UP_mean[0], '+-', UP_std[0])
-print('UP True', UP_mean[1], '+-', UP_std[1])
+GET_std = [stat.pstdev(RLF_GET)*1000, stat.pstdev(RLT_GET)*1000]
+GET_mean = [stat.mean(RLF_GET)*1000, stat.mean(RLT_GET)*1000]
+print('GET False', round(GET_mean[0],3), '+-', round(GET_std[0],3))
+print('GET True', round(GET_mean[1],3), '+-', round(GET_std[1],3))
+STEP_std = [stat.pstdev(RLF_STEP)*1000, stat.pstdev(RLT_STEP)*1000]
+STEP_mean = [stat.mean(RLF_STEP)*1000, stat.mean(RLT_STEP)*1000]
+print('STEP False', round(STEP_mean[0],3), '+-', round(STEP_std[0],3))
+print('STEP True', round(STEP_mean[1],3), '+-', round(STEP_std[1],3))
+UP_std = [stat.pstdev(RLF_UP)*1000, stat.pstdev(RLT_UP)*1000]
+UP_mean = [stat.mean(RLF_UP)*1000, stat.mean(RLT_UP)*1000]
+print('UP False', round(UP_mean[0],3), '+-', round(UP_std[0],3))
+print('UP True', round(UP_mean[1],3), '+-', round(UP_std[1],3))
+Total_mean = [GET_mean[0]+STEP_mean[0]+UP_mean[0], GET_mean[1]+STEP_mean[1]+UP_mean[1]]
+Total_std = [GET_std[0]+STEP_std[0]+UP_std[0], GET_std[1]+STEP_std[1]+UP_std[1]]
+print('Total False', round(Total_mean[0],3), '+-', round(Total_std[0],3))
+print('Total True', round(Total_mean[1],3), '+-', round(Total_std[1],3))
+print('Speedup', round(Total_mean[0]/Total_mean[1],3))
 
 plt.bar([0, 1], GET_mean, width, label='Get action')
 plt.bar([0, 1], STEP_mean, width, bottom=GET_mean, label='Environment step')
 plt.bar([0, 1], UP_mean, width, bottom=np.add(GET_mean, STEP_mean).tolist(), label='Update network')
 plt.xticks([0, 1], ('Full graph', 'Downsampled graph'))
-plt.ylabel('Time [s]')
+plt.ylabel('Time [$\mu s$]')
 #env1.title.set_text('Environment 1')#,y=1.25)
 fig.text(0.5,0.08, "Environment 2", ha="center")
 plt.legend(loc='upper center',bbox_to_anchor=(0.5, 1.1), ncol=3)

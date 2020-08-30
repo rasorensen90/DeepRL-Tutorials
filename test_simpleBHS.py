@@ -496,7 +496,7 @@ if __name__ == '__main__':
     parser.add_argument('--network', type=str, default="GCN")
     parser.add_argument('--downsampled', type=str, default=False)
     parser.add_argument('--numtotes', type=int, default=1)
-    parser.add_argument('--RL_only', type=str2bool, default=False)
+    parser.add_argument('--RL_only', type=str2bool, default=True)
     parser.add_argument('--detailed_log', type=str2bool, default=True)
     parser.add_argument('--no_render', type=str2bool, default=True)
     parser.add_argument('--randomize_numtotes', type=str2bool, default=False)
