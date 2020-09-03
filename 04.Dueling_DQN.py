@@ -287,7 +287,7 @@ class Arg_parser():
         self.step_penalty = None
         self.trasum_scale = None
         self.destination_score = None
-        self.numtotes = 30
+        self.numtotes = 50
         self.randomize_numtotes = False
         self.RL_diverters = None
         self.downsampled = downsampled

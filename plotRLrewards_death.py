@@ -28,7 +28,7 @@ plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 plt.rc('figure',figsize=figuresize)
 
-network = 'PNA'
+network = 'DQN'
 os.makedirs('Figures/' + network + '/', exist_ok = True)
 
 if (network == 'DQN'):
