@@ -1,6 +1,7 @@
 import numpy as np
 
 import torch
+import torch.nn as nn
 import torch.optim as optim
 import gym
 from agents.BaseAgent import BaseAgent
@@ -29,12 +30,12 @@ class Model(BaseAgent):
         self.priority_beta_start = config.PRIORITY_BETA_START
         self.priority_beta_frames = config.PRIORITY_BETA_FRAMES
         self.priority_alpha = config.PRIORITY_ALPHA
-
+    
         self.static_policy = static_policy
         self.num_feats = env.observation_space.shape
         self.num_actions = env.action_space.nvec if isinstance(env.action_space, gym.spaces.MultiDiscrete) else env.action_space.n
         self.env = env
-
+        self.loss_function = nn.SmoothL1Loss()
         self.declare_networks()
             
         self.target_model.load_state_dict(self.model.state_dict())
@@ -116,11 +117,12 @@ class Model(BaseAgent):
         diff = torch.mean(torch.abs((expected_q_values - current_q_values)), dim=-1)
         if self.priority_replay:
             self.memory.update_priorities(indices, diff.detach().squeeze().abs().cpu().numpy().tolist())
-            loss = self.MSE(diff).squeeze() * weights
+            #loss = self.MSE(diff).squeeze() * weights
+            loss = self.loss_function(current_q_values,expected_q_values).squeeze() * weights
         else:
-            loss = self.MSE(diff)
+            #loss = self.MSE(diff)
+            loss = self.loss_function(current_q_values,expected_q_values)
         loss = loss.mean()
-
         return loss
 
     def update(self, s, a, r, s_, frame=0):

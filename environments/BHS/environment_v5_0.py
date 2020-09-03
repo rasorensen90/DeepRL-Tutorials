@@ -43,7 +43,9 @@ class Environment(gym.Env):
         else:
             self.nodes = [*range(len(self.elems))]
         print("Downsampled: ", args.downsampled) 
-        print("Number of nodes:", len(self.nodes))
+        print("Number of nodes in graph:", len(self.nodes))
+        print("Randomize number of totes: ", self.randomize_numtotes)
+        print("Number of totes:", self.numtotes)
         
         if args.RL_diverters is not None:
             self.rl_diverter_ids = list(map(int,args.RL_diverters))

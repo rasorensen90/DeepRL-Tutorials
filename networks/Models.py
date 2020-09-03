@@ -78,8 +78,8 @@ class BHS_GCN(nn.Module):
         self.edge = edgelist
         self.edge_weight = edge_weight
 
-        self.conv1 = GCNConv(self.input_shape[1], 128)
-        self.conv2 = GCNConv(128, 256)
+        self.conv1 = GCNConv(self.input_shape[1], 128, cached=True)
+        self.conv2 = GCNConv(128, 256, cached=True)
         
         self.adv = nn.Linear(self.feature_size(), sum(self.num_actions)) # Might be an idea to add another fc layer here
 
@@ -172,7 +172,7 @@ class BHS_SGN(nn.Module):
         self.edge = edgelist
         self.edge_weight = edge_weight
 
-        self.conv1 = SGConv(self.input_shape[1], 128,K=2)
+        self.conv1 = SGConv(self.input_shape[1], 128, K=2, cached=True)
 
         self.adv = nn.Linear(self.feature_size(), sum(self.num_actions)) # Might be an idea to add another fc layer here
 
