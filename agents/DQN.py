@@ -117,11 +117,11 @@ class Model(BaseAgent):
         diff = torch.mean(torch.abs((expected_q_values - current_q_values)), dim=-1)
         if self.priority_replay:
             self.memory.update_priorities(indices, diff.detach().squeeze().abs().cpu().numpy().tolist())
-            #loss = self.MSE(diff).squeeze() * weights
-            loss = self.loss_function(current_q_values,expected_q_values).squeeze() * weights
+            loss = self.MSE(diff).squeeze() * weights
+            #loss = self.loss_function(current_q_values,expected_q_values).squeeze() * weights
         else:
-            #loss = self.MSE(diff)
-            loss = self.loss_function(current_q_values,expected_q_values)
+            loss = self.MSE(diff)
+            #loss = self.loss_function(current_q_values,expected_q_values)
         loss = loss.mean()
         return loss
 
