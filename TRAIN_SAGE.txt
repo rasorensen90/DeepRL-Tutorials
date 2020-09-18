@@ -1,0 +1,19 @@
+#!/bin/sh
+#jupyter nbconvert --to python Dueling_Double_DQN.ipynb
+#ipython Dueling_Double_DQN.py SAGE False 30
+#ipython Dueling_Double_DQN.py SAGE False 50
+#ipython Dueling_Double_DQN.py SAGE False 80
+#ipython Dueling_Double_DQN.py SAGE False True
+#ipython Dueling_Double_DQN.py SAGE True 30
+#ipython Dueling_Double_DQN.py SAGE True 50
+#ipython Dueling_Double_DQN.py SAGE True 80
+#ipython Dueling_Double_DQN.py SAGE True True
+#jupyter nbconvert --to python 04.Dueling_DQN.ipynb
+ipython 04.Dueling_DQN.py SAGE False 30
+ipython 04.Dueling_DQN.py SAGE False 50
+ipython 04.Dueling_DQN.py SAGE False 80
+ipython 04.Dueling_DQN.py SAGE False True
+ipython 04.Dueling_DQN.py SAGE True 30
+ipython 04.Dueling_DQN.py SAGE True 50
+ipython 04.Dueling_DQN.py SAGE True 80
+ipython 04.Dueling_DQN.py SAGE True True

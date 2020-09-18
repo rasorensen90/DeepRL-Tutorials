@@ -1,0 +1,23 @@
+#!/bin/sh
+jupyter nbconvert --to python Dueling_Double_DQN.ipynb
+jupyter nbconvert --to python 04.Dueling_DQN.ipynb
+tr -d '\r' < TRAIN_GGNN.txt > TRAIN_GGNN.sh
+chmod u+r+x TRAIN_GGNN.sh
+tr -d '\r' < TRAIN_GCN.txt > TRAIN_GCN.sh
+chmod u+r+x TRAIN_GCN.sh
+tr -d '\r' < TRAIN_NN.txt > TRAIN_NN.sh
+chmod u+r+x TRAIN_NN.sh
+tr -d '\r' < TRAIN_GIN.txt > TRAIN_GIN.sh
+chmod u+r+x TRAIN_GIN.sh
+tr -d '\r' < TRAIN_GAT.txt > TRAIN_GAT.sh
+chmod u+r+x TRAIN_GAT.sh
+tr -d '\r' < TRAIN_SAGE.txt > TRAIN_SAGE.sh
+chmod u+r+x TRAIN_SAGE.sh
+tr -d '\r' < TRAIN_PNA.txt > TRAIN_PNA.sh
+chmod u+r+x TRAIN_PNA.sh
+tr -d '\r' < TRAIN_CG.txt > TRAIN_CG.sh
+chmod u+r+x TRAIN_CG.sh
+tr -d '\r' < TRAIN_DQN.txt > TRAIN_DQN.sh
+chmod u+r+x TRAIN_DQN.sh
+tr -d '\r' < TRAIN_SGN.txt > TRAIN_SGN.sh
+chmod u+r+x TRAIN_SGN.sh

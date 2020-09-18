@@ -57,7 +57,7 @@ config.USE_PRIORITY_REPLAY = True
 
 #memory
 config.TARGET_NET_UPDATE_FREQ = 1000
-config.EXP_REPLAY_SIZE = 50000
+config.EXP_REPLAY_SIZE = 100000
 config.BATCH_SIZE = 32
 
 #Learning control variables
@@ -80,6 +80,7 @@ config.ACTION_SELECTION_COUNT_FREQUENCY = 1000
 class Model(DQN_Agent):
     def __init__(self, static_policy=False, env=None, config=None, log_dir='tmp/gym/', network ="DQN", downsampled = False):
         super(Model, self).__init__(static_policy, env, config, log_dir=log_dir)
+        
 
     def declare_networks(self):
         if (network == "DQN"):
@@ -249,16 +250,27 @@ start=timer()
 
 if (get_ipython().__class__.__name__ == "ZMQInteractiveShell"):
     network = "NN"
-    downsampled = True
-elif (len(sys.argv) > 2):
+    downsampled = False
+    numtotes = 30
+    randomize_numtotes = False
+elif (len(sys.argv) > 3):
     network = sys.argv[1]
     downsampled = sys.argv[2]
+    totes = sys.argv[3]
     if (downsampled == "True"):
         downsampled = True
     elif (downsampled == "False"):
         downsampled = False
     else:
         raise ValueError("Downsampling not chosen - Choose True or False")
+    if (totes == "True"):
+        randomize_numtotes = True
+        numtotes = 50
+    elif (totes.isnumeric()):
+        randomize_numtotes = False
+        numtotes = int(totes)
+    else:
+        raise ValueError("Number of totes not chosen - Choose a number or True or False")
 else:
     raise ValueError("Network or downsampling not chosen")
 
@@ -287,8 +299,8 @@ class Arg_parser():
         self.step_penalty = None
         self.trasum_scale = None
         self.destination_score = None
-        self.numtotes = 50
-        self.randomize_numtotes = False
+        self.numtotes = numtotes
+        self.randomize_numtotes = randomize_numtotes
         self.RL_diverters = None
         self.downsampled = downsampled
     

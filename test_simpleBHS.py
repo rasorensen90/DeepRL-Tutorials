@@ -258,6 +258,7 @@ def main(args):
     date_time = args.load_from_model
     model  = Model(env=env, config=config, network=args.network, downsampled=args.downsampled)
     model.load_model_dict(log_dir + args.network + "_" + date_time + ".pt")
+    #print(model.model.conv1.__dict__)
     base_directory = log_dir + "Test/"
     logdir = base_directory + date_time + "/"
     if not os.path.exists(logdir):
@@ -492,8 +493,8 @@ if __name__ == '__main__':
     parser.add_argument('--envtype', type=str, default='env_2_0')
     parser.add_argument('--steplimit', type=int, default=200)
     parser.add_argument('--iterations', type=int, default=100)
-    parser.add_argument('--load_from_model', type=str, default="2020-07-02-15")
-    parser.add_argument('--network', type=str, default="GCN")
+    parser.add_argument('--load_from_model', type=str, default="2020-09-07-22")
+    parser.add_argument('--network', type=str, default="GGNN")
     parser.add_argument('--downsampled', type=str, default=False)
     parser.add_argument('--numtotes', type=int, default=1)
     parser.add_argument('--RL_only', type=str2bool, default=True)

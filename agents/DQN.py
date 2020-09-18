@@ -153,6 +153,8 @@ class Model(BaseAgent):
         with torch.no_grad():
             X = torch.tensor([s], device=self.device, dtype=torch.float)
             self.model.sample_noise()
+            #a = self.model(X)
+            #print(a)
             a = self.model(X).max(-1)[1].view(1, -1)
             act = np.zeros(a.size(),dtype=np.int32)
             #for n in range(a.size()[0]): # batches

@@ -1,0 +1,19 @@
+#!/bin/sh
+#jupyter nbconvert --to python Dueling_Double_DQN.ipynb
+#ipython Dueling_Double_DQN.py DQN False 30
+#ipython Dueling_Double_DQN.py DQN False 50
+#ipython Dueling_Double_DQN.py DQN False 80
+#ipython Dueling_Double_DQN.py DQN False True
+#ipython Dueling_Double_DQN.py DQN True 30
+#ipython Dueling_Double_DQN.py DQN True 50
+#ipython Dueling_Double_DQN.py DQN True 80
+#ipython Dueling_Double_DQN.py DQN True True
+#jupyter nbconvert --to python 04.Dueling_DQN.ipynb
+ipython 04.Dueling_DQN.py DQN False 30
+ipython 04.Dueling_DQN.py DQN False 50
+ipython 04.Dueling_DQN.py DQN False 80
+ipython 04.Dueling_DQN.py DQN False True
+ipython 04.Dueling_DQN.py DQN True 30
+ipython 04.Dueling_DQN.py DQN True 50
+ipython 04.Dueling_DQN.py DQN True 80
+ipython 04.Dueling_DQN.py DQN True True
