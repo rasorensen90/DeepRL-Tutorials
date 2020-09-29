@@ -52,7 +52,7 @@ config.epsilon_by_frame = lambda frame_idx: config.epsilon_final + (config.epsil
 
 #misc agent variables
 config.GAMMA=0.9
-config.LR=1e-3
+config.LR=1e-4
 config.USE_PRIORITY_REPLAY = True
 
 #memory
@@ -314,8 +314,8 @@ env    = bench.Monitor(env, os.path.join(log_dir, env_id))
 # env    = wrap_deepmind(env, episode_life=True, clip_rewards=True, frame_stack=False, scale=True)
 # env    = ImageToPyTorch(env)
 model  = Model(env=env, config=config, log_dir=log_dir, network=network, downsampled=downsampled)
-#model_time = '2020-09-07-22'
-#model.load_model_dict(res_dir + network + "_" + model_time + ".pt")
+model_time = '2020-09-15-11'
+model.load_model_dict(res_dir + network + "_" + model_time + ".pt")
 
 episode_reward = 0
 time_get, time_step, time_update = 0,0,0

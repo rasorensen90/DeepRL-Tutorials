@@ -50,6 +50,7 @@ class BHSDuelingDQN(nn.Module):
         val = F.relu(self.val1(x))
         val = F.relu(self.val2(val))
         val = self.val3(val)
+        
         return val.unsqueeze(-1).expand_as(adv) + adv - adv.mean(-1).unsqueeze(-1).expand_as(adv)
     
     def feature_size(self):

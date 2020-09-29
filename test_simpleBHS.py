@@ -258,7 +258,7 @@ def main(args):
     date_time = args.load_from_model
     model  = Model(env=env, config=config, network=args.network, downsampled=args.downsampled)
     model.load_model_dict(log_dir + args.network + "_" + date_time + ".pt")
-    #print(model.model.conv1.__dict__)
+    #print(model.model.adv.__dict__)
     base_directory = log_dir + "Test/"
     logdir = base_directory + date_time + "/"
     if not os.path.exists(logdir):
@@ -279,6 +279,8 @@ def main(args):
     fn = ['NumTotes', 'Load', 'RL_mean_step', 'SSP_mean_step', 'DSP_mean_step', 'DSPdla_mean_step', 'RL_var_step', 'SSP_var_step', 'DSP_var_step', 'DSPdla_var_step', 'RL_mean_rew', 'SSP_mean_rew', 'DSP_mean_rew', 'DSPdla_mean_rew', 'RL_var_rew', 'SSP_var_rew', 'DSP_var_rew', 'DSPdla_var_rew', 'RL_deadlocks', 'SSP_deadlocks', 'DSP_deadlocks', 'DSPdla_deadlocks']
     seed=0
     prediction_time_total = []
+    sum_act = [0, 0, 0, 0, 0, 0, 0]
+    RL_st=0
     for n in range(1, envsize+1):
         prediction_time_n = []
         for i in range(args.iterations):
@@ -293,18 +295,22 @@ def main(args):
                     env.render()
                 start = time.time()
                 action = model.get_action(obs)[0]
+                sum_act += action
                 end = time.time()
                 prediction_time.append(end-start)
 #                obs, RLRew, done, tote_info = env.step(action, shortestPath=False, dynamic=False, dla=False)
                 obs, RLRew, done, tote_info, _ = env.step(action)#, shortestPath=False, dynamic=False, dla=True)
                 RL_reward += RLRew
                 RL_steps += 1
+                RL_st += 1
     #        print("Episode reward", episode_rew)
             prediction_time_n.append(np.mean(prediction_time))
             print("Average prediction time: ", prediction_time_n[-1])
             print("RL")
             print("Reward = "+str(RL_reward))
             print("Steps = "+str(RL_steps))
+            #print(sum_act)
+            #print(sum_act/(RL_st))
             RL_reward_collection.append(RL_reward)
             RL_step_collection.append(RL_steps)
             if RL_steps < env.steplimit:
